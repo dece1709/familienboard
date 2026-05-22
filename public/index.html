@@ -11,99 +11,79 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: 100%; }
-    body {
-      background: #F7F4EF; font-family: 'DM Sans', sans-serif;
-      overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
-      user-select: none; min-height: 100dvh;
-    }
+    body { background: #F7F4EF; font-family: 'DM Sans', sans-serif; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; user-select: none; min-height: 100dvh; }
     button { touch-action: manipulation; font-family: 'DM Sans', sans-serif; cursor: pointer; }
     input { font-family: 'DM Sans', sans-serif; user-select: text; -webkit-user-select: text; }
     @keyframes blink { 50% { opacity: 0.2; } }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-thumb { background: #E8E4DC; border-radius: 4px; }
 
-    #app { display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; min-height: 100dvh; padding-bottom: 76px; }
+    #app { display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; height: 100dvh; overflow: hidden; }
 
-    #header {
-      padding: 10px 16px 10px 20px; border-bottom: 1px solid #E8E4DC;
-      background: #F7F4EF; position: sticky; top: 0; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    }
-    .logo { font-family: 'Playfair Display', serif; font-size: 24px; color: #1A1A2E; font-weight: 700; }
+    /* Header */
+    #header { padding: 10px 16px 10px 20px; border-bottom: 1px solid #E8E4DC; background: #F7F4EF; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+    .logo { font-family: 'Playfair Display', serif; font-size: 22px; color: #1A1A2E; font-weight: 700; white-space: nowrap; }
     .logo span { color: #2D6A4F; }
-    .sync-row { display: flex; align-items: center; gap: 5px; margin-top: 2px; flex-wrap: wrap; }
+    .sync-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; flex: 1; }
     .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #8A8A9A; flex-shrink: 0; }
     .sync-dot.ok { background: #2D6A4F; }
     .sync-dot.error { background: #E07A5F; }
     .sync-label { font-size: 11px; color: #8A8A9A; }
     .refresh-btn { background: none; border: none; color: #8A8A9A; font-size: 14px; padding: 0 3px; }
-    #clock { text-align: right; }
-    #clock-time { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; color: #1A1A2E; line-height: 1; }
+    #clock { text-align: right; flex-shrink: 0; }
+    #clock-time { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #1A1A2E; line-height: 1; }
     #clock-time .colon { animation: blink 1s step-end infinite; }
     #clock-date { font-size: 11px; color: #8A8A9A; margin-top: 1px; }
-    .settings-btn { background: none; border: 1.5px solid #E8E4DC; border-radius: 10px; width: 38px; height: 38px; font-size: 17px; display: flex; align-items: center; justify-content: center; }
+    .settings-btn { background: none; border: 1.5px solid #E8E4DC; border-radius: 10px; width: 36px; height: 36px; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-    #main { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+    /* Main layout */
+    #main { flex: 1; display: flex; overflow: hidden; min-height: 0; padding-bottom: 74px; }
 
     /* Calendar panel */
     #cal-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
-    #cal-scroll { flex: 1; overflow-y: auto; padding: 12px 14px 8px 20px; display: flex; flex-direction: column; gap: 14px; }
+    #cal-scroll { flex: 1; overflow-y: auto; padding: 10px 12px 8px 18px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+
+    /* Tab bar - inside cal panel */
+    #tabbar { display: flex; gap: 8px; padding: 6px 18px; justify-content: flex-start; flex-shrink: 0; border-top: 1px solid #E8E4DC; }
+    .tab-btn { min-height: 34px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; color: #8A8A9A; background: transparent; padding: 0 18px; }
+    .tab-btn.active { background: #2D6A4F; color: #fff; }
+
+    /* Weather strip - full width, fixed at bottom */
+    #weather-strip { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1400px; padding: 7px 18px 8px; border-top: 1px solid #E8E4DC; background: rgba(247,244,239,0.97); display: flex; gap: 10px; align-items: stretch; z-index: 15; flex-shrink: 0; }
+    .wx-now { background: #fff; border: 1.5px solid #E8E4DC; border-radius: 10px; padding: 7px 12px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; min-width: 180px; }
+    .wx-icon { font-size: 30px; line-height: 1; }
+    .wx-temp-big { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #1A1A2E; line-height: 1; }
+    .wx-desc { font-size: 11px; color: #1A1A2E; font-weight: 600; margin-top: 1px; }
+    .wx-temp-range { font-size: 10px; color: #8A8A9A; margin-top: 2px; }
+    .wx-details { font-size: 10px; color: #8A8A9A; margin-top: 2px; display: flex; gap: 8px; }
+    .wx-forecast { flex: 1; display: flex; gap: 5px; }
+    .wx-day { flex: 1; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 8px; padding: 5px 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+    .wx-day-name { font-size: 9px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.4px; }
+    .wx-day-icon { font-size: 18px; line-height: 1; }
+    .wx-day-max { font-size: 13px; font-weight: 700; color: #1A1A2E; }
+    .wx-day-min { font-size: 10px; color: #8A8A9A; }
+    .wx-day-rain { font-size: 9px; color: #1A73E8; font-weight: 600; }
+    .wx-loading { color: #8A8A9A; font-size: 12px; padding: 8px; }
 
     /* Two-week grid */
-    .week-block { display: flex; flex-direction: column; gap: 6px; }
-    .week-label { font-size: 12px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.6px; padding-left: 2px; }
+    .week-block { display: flex; flex-direction: column; gap: 5px; }
+    .week-label { font-size: 11px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.6px; padding-left: 2px; }
     .week-label.current { color: #2D6A4F; }
-    .day-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; }
-    .day-col {
-      background: #fff; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      padding: 7px 4px; display: flex; flex-direction: column; gap: 3px;
-      min-height: 120px; overflow: hidden; position: relative;
-    }
+    .day-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
+    .day-col { background: #fff; border: 1.5px solid #E8E4DC; border-radius: 10px; padding: 6px 4px; display: flex; flex-direction: column; gap: 3px; min-height: 90px; overflow: hidden; }
     .day-col.today { background: #2D6A4F0D; border-color: #2D6A4F; border-width: 2px; }
-    .day-col.tomorrow { border-color: #1A73E844; }
     .day-header { text-align: center; margin-bottom: 2px; }
     .day-name { font-size: 9px; color: #8A8A9A; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-    .day-num { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #1A1A2E; width: 30px; margin: 1px auto 0; line-height: 30px; border-radius: 8px; text-align: center; }
+    .day-num { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #1A1A2E; width: 28px; margin: 1px auto 0; line-height: 28px; border-radius: 7px; text-align: center; }
     .day-col.today .day-num { background: #2D6A4F; color: #fff; }
     .day-col.today .day-name { color: #2D6A4F; }
-    .event-chip { border-radius: 5px; padding: 2px 4px; font-size: 10px; color: #1A1A2E; word-break: break-word; line-height: 1.35; }
+    .event-chip { border-radius: 4px; padding: 2px 4px; font-size: 10px; color: #1A1A2E; word-break: break-word; line-height: 1.3; }
     .event-time { font-weight: 700; font-size: 9px; display: block; }
-    .more-badge {
-      font-size: 9px; font-weight: 700; color: #8A8A9A;
-      background: #F0EDE8; border-radius: 4px; padding: 1px 5px;
-      text-align: center; cursor: pointer; margin-top: 1px;
-    }
+    .more-badge { font-size: 9px; font-weight: 700; color: #8A8A9A; background: #F0EDE8; border-radius: 4px; padding: 1px 4px; text-align: center; }
 
-    /* Shopping panel */
-    #shop-panel {
-      width: 280px; flex-shrink: 0; border-left: 1px solid #E8E4DC;
-      display: flex; flex-direction: column; background: #FAFAF8;
-    }
-    .shop-header { padding: 12px 14px 8px; border-bottom: 1px solid #E8E4DC; display: flex; align-items: center; justify-content: space-between; }
-    .shop-title { font-family: 'Playfair Display', serif; font-size: 16px; color: #1A1A2E; font-weight: 700; }
-    .shop-stats { font-size: 10px; color: #8A8A9A; margin-top: 1px; }
-    .shop-list { flex: 1; overflow-y: auto; padding: 7px 10px; display: flex; flex-direction: column; gap: 4px; }
-    .shop-item { display: flex; align-items: center; gap: 7px; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 9px; padding: 7px 8px; min-height: 40px; }
-    .shop-item.done { opacity: 0.4; }
-    .shop-check { width: 24px; height: 24px; border-radius: 6px; border: 2px solid #E07A5F; background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #fff; }
-    .shop-check.checked { background: #E07A5F; border-color: #E07A5F; }
-    .shop-text { flex: 1; font-size: 13px; color: #1A1A2E; line-height: 1.3; }
-    .shop-text.done-text { text-decoration: line-through; }
-    .shop-qty { font-size: 11px; color: #8A8A9A; font-weight: 600; background: #F7F4EF; border-radius: 5px; padding: 1px 6px; flex-shrink: 0; }
-    .shop-del { background: none; border: none; color: #D0D0D0; font-size: 17px; padding: 0 2px; flex-shrink: 0; }
-    .shop-add { padding: 8px 10px; border-top: 1px solid #E8E4DC; display: flex; flex-direction: column; gap: 5px; }
-    .shop-add input { border: 1.5px solid #E8E4DC; border-radius: 9px; padding: 8px 10px; font-size: 13px; background: #fff; color: #1A1A2E; outline: none; width: 100%; }
-    .shop-add input:focus { outline: 2px solid #E07A5F33; }
-    .shop-add-row { display: flex; gap: 5px; }
-    .shop-qty-input { width: 58px !important; flex: none !important; }
-    .btn-add-shop { background: #E07A5F; color: #fff; border: none; border-radius: 9px; padding: 8px 12px; font-size: 13px; font-weight: 700; flex: 1; }
-    .shop-clear-btn { background: none; border: none; color: #B0B0B0; font-size: 11px; padding: 3px 0; text-align: center; width: 100%; }
-    .shop-empty { color: #8A8A9A; text-align: center; padding: 20px 10px; font-size: 12px; }
-
-    /* Upcoming tab */
-    #upcoming-panel { flex: 1; padding: 16px 20px; overflow-y: auto; }
+    /* Upcoming */
     .upcoming-list { display: flex; flex-direction: column; gap: 7px; }
-    .upcoming-item { display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 12px; padding: 11px 14px; }
+    .upcoming-item { display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 12px; padding: 10px 14px; }
     .upcoming-item.highlight { background: #1A73E810; border-color: #1A73E844; }
     .upcoming-date { min-width: 66px; text-align: center; flex-shrink: 0; }
     .upcoming-date-label { font-size: 12px; font-weight: 700; }
@@ -114,13 +94,40 @@
     .badge { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; }
     .badge-green { color: #2D6A4F; background: #2D6A4F18; }
     .badge-blue { color: #1A73E8; background: #1A73E818; }
-    .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #1A1A2E; margin-bottom: 12px; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #1A1A2E; margin-bottom: 10px; }
     .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 14px; }
 
-    /* Tab bar */
-    #tabbar { display: flex; gap: 6px; flex-shrink: 0; }
-    .tab-btn { min-height: 36px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; color: #8A8A9A; background: transparent; padding: 0 16px; }
-    .tab-btn.active { background: #2D6A4F; color: #fff; }
+    /* Shopping panel */
+    #shop-panel { width: 270px; flex-shrink: 0; border-left: 1px solid #E8E4DC; display: flex; flex-direction: column; background: #FAFAF8; overflow: hidden; min-height: 0; }
+    .shop-header { padding: 10px 12px 8px; border-bottom: 1px solid #E8E4DC; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .shop-title { font-family: 'Playfair Display', serif; font-size: 15px; color: #1A1A2E; font-weight: 700; }
+    .shop-stats { font-size: 10px; color: #8A8A9A; margin-top: 1px; }
+    .shop-list { flex: 1; overflow-y: auto; padding: 6px 9px; display: flex; flex-direction: column; gap: 4px; min-height: 0; }
+    .shop-item { display: flex; align-items: center; gap: 7px; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 9px; padding: 7px 8px; min-height: 38px; }
+    .shop-item.done { opacity: 0.4; }
+    .shop-check { width: 24px; height: 24px; border-radius: 6px; border: 2px solid #E07A5F; background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #fff; }
+    .shop-check.checked { background: #E07A5F; border-color: #E07A5F; }
+    .shop-text { flex: 1; font-size: 13px; color: #1A1A2E; line-height: 1.3; }
+    .shop-text.done-text { text-decoration: line-through; }
+    .shop-qty { font-size: 11px; color: #8A8A9A; font-weight: 600; background: #F7F4EF; border-radius: 5px; padding: 1px 6px; flex-shrink: 0; }
+    .shop-del { background: none; border: none; color: #D0D0D0; font-size: 17px; padding: 0 2px; flex-shrink: 0; }
+    .shop-add { padding: 7px 9px; border-top: 1px solid #E8E4DC; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
+    .shop-add input { border: 1.5px solid #E8E4DC; border-radius: 9px; padding: 8px 10px; font-size: 13px; background: #fff; color: #1A1A2E; outline: none; width: 100%; }
+    .shop-add input:focus { outline: 2px solid #E07A5F33; }
+    .shop-add-row { display: flex; gap: 5px; }
+    .shop-qty-input { width: 58px !important; flex: none !important; }
+    .btn-add-shop { background: #E07A5F; color: #fff; border: none; border-radius: 9px; padding: 8px 10px; font-size: 13px; font-weight: 700; flex: 1; }
+    .shop-clear-btn { background: none; border: none; color: #B0B0B0; font-size: 11px; padding: 2px 0; text-align: center; width: 100%; }
+    .shop-empty { color: #8A8A9A; text-align: center; padding: 16px 10px; font-size: 12px; }
+
+    /* Day popup */
+    .day-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 50; }
+    .day-popup { background: #fff; border-radius: 16px; padding: 20px; width: min(340px, 88vw); box-shadow: 0 12px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; max-height: 80vh; overflow-y: auto; }
+    .day-popup h3 { font-family: 'Playfair Display', serif; font-size: 18px; color: #1A1A2E; }
+    .popup-event { background: #FAFAF8; border-radius: 8px; padding: 8px 10px; border-left: 3px solid #ccc; }
+    .popup-event-time { font-size: 11px; font-weight: 700; display: block; margin-bottom: 2px; }
+    .popup-event-title { font-size: 14px; color: #1A1A2E; }
+    .popup-close { background: #F7F4EF; border: none; border-radius: 9px; padding: 9px; font-size: 13px; font-weight: 700; color: #8A8A9A; }
 
     /* Modal */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
@@ -144,75 +151,29 @@
     .status-error { font-size: 12px; color: #E07A5F; }
     .status-loading { font-size: 12px; color: #8A8A9A; }
     .divider { border: none; border-top: 1px solid #E8E4DC; margin: 2px 0; }
-
-    /* Day detail popup */
-    .day-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 50; }
-    .day-popup { background: #fff; border-radius: 16px; padding: 20px; width: min(340px, 88vw); box-shadow: 0 12px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; }
-    .day-popup h3 { font-family: 'Playfair Display', serif; font-size: 18px; color: #1A1A2E; }
-    .popup-event { display: flex; flex-direction: column; gap: 1px; background: #FAFAF8; border-radius: 8px; padding: 8px 10px; border-left: 3px solid #ccc; }
-    .popup-event-time { font-size: 11px; font-weight: 700; }
-    .popup-event-title { font-size: 14px; color: #1A1A2E; }
-    .popup-close { background: #F7F4EF; border: none; border-radius: 9px; padding: 9px; font-size: 13px; font-weight: 700; color: #8A8A9A; }
-
-    /* Weather strip */
-    #weather-strip {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 1400px;
-      padding: 8px 20px 10px;
-      border-top: 1px solid #E8E4DC;
-      background: rgba(247,244,239,0.97);
-      display: flex; gap: 10px; align-items: stretch;
-      z-index: 15;
-    }
-    .wx-now {
-      background: #fff; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      padding: 10px 14px; display: flex; align-items: center; gap: 12px;
-      flex-shrink: 0; min-width: 200px;
-    }
-    .wx-icon { font-size: 36px; line-height: 1; }
-    .wx-temp-big { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #1A1A2E; line-height: 1; }
-    .wx-temp-range { font-size: 11px; color: #8A8A9A; margin-top: 2px; }
-    .wx-desc { font-size: 12px; color: #1A1A2E; font-weight: 600; margin-top: 1px; }
-    .wx-details { font-size: 11px; color: #8A8A9A; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
-    .wx-forecast {
-      flex: 1; display: flex; gap: 6px; overflow: hidden;
-    }
-    .wx-day {
-      flex: 1; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 10px;
-      padding: 7px 6px; display: flex; flex-direction: column; align-items: center;
-      gap: 3px; min-width: 0;
-    }
-    .wx-day-name { font-size: 10px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.4px; }
-    .wx-day-icon { font-size: 20px; line-height: 1; }
-    .wx-day-max { font-size: 14px; font-weight: 700; color: #1A1A2E; }
-    .wx-day-min { font-size: 11px; color: #8A8A9A; }
-    .wx-day-rain { font-size: 10px; color: #1A73E8; font-weight: 600; }
-    .wx-loading { color: #8A8A9A; font-size: 12px; padding: 8px; }
   </style>
 </head>
 <body>
 <div id="app">
   <div id="header">
-    <div>
+    <div style="flex-shrink:0">
       <div class="logo">Familien<span>board</span></div>
-      <div class="sync-row" id="sync-row"></div>
     </div>
-    <div id="tabbar">
-      <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Woche</button>
-      <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
+    <div class="sync-row" id="sync-row"></div>
+    <div id="clock">
+      <div id="clock-time"><span id="ch">00</span><span class="colon">:</span><span id="cm">00</span></div>
+      <div id="clock-date"></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <div id="clock">
-        <div id="clock-time"><span id="ch">00</span><span class="colon">:</span><span id="cm">00</span></div>
-        <div id="clock-date"></div>
-      </div>
-      <button class="settings-btn" onclick="openSettings()">⚙️</button>
-    </div>
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
   </div>
 
   <div id="main">
     <div id="cal-panel">
       <div id="cal-scroll"></div>
+      <div id="tabbar">
+        <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Woche</button>
+        <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
+      </div>
     </div>
     <div id="shop-panel">
       <div class="shop-header">
@@ -234,11 +195,8 @@
     </div>
   </div>
 
-
-
-</div>
-
   <div id="weather-strip"><span class="wx-loading">⏳ Wetter wird geladen…</span></div>
+</div>
 
 <!-- Settings Modal -->
 <div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettingsOverlay(event)">
@@ -263,7 +221,7 @@
   </div>
 </div>
 
-<!-- Day detail popup -->
+<!-- Day popup -->
 <div class="day-popup-overlay" id="day-popup" style="display:none" onclick="closeDayPopup(event)">
   <div class="day-popup" onclick="event.stopPropagation()">
     <h3 id="popup-title"></h3>
@@ -275,10 +233,11 @@
 <script>
   const DAYS_SHORT = ["Mo","Di","Mi","Do","Fr","Sa","So"];
   const DAYS_LONG = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+  const DAYS_SHORT_WX = ["So","Mo","Di","Mi","Do","Fr","Sa"];
   const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
   const MONTHS_SHORT = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
   const CAL_COLORS = ["#1A73E8","#2D6A4F","#C77DFF","#E07A5F","#F4A261","#2A9D8F","#E76F51"];
-  const MAX_EVENTS_PER_DAY = 3;
+  const MAX_EV = 3;
 
   let currentTab = "week";
   let calendars = [];
@@ -340,10 +299,9 @@
       const val = line.slice(colon+1).trim();
       if (key === "SUMMARY" || key.startsWith("SUMMARY;")) cur.title = val;
       if (key === "DTSTART" || key.startsWith("DTSTART;")) {
-        const y=val.slice(0,4), m=val.slice(4,6), d=val.slice(6,8);
-        cur.date = y+"-"+m+"-"+d;
-        cur.time = val.indexOf("T") !== -1 ? val.slice(9,11)+":"+val.slice(11,13) : "";
-        cur.id = "e_"+Math.random().toString(36).slice(2);
+        cur.date = val.slice(0,4) + "-" + val.slice(4,6) + "-" + val.slice(6,8);
+        cur.time = val.indexOf("T") !== -1 ? val.slice(9,11) + ":" + val.slice(11,13) : "";
+        cur.id = "e_" + Math.random().toString(36).slice(2);
       }
     }
     return events;
@@ -363,25 +321,18 @@
   function fetchAllCals() { calendars.forEach(fetchCal); }
   setInterval(fetchAllCals, 5 * 60 * 1000);
 
-  // Shopping
   async function loadShopping() {
     try {
       const res = await fetch("/api/shopping");
       if (!res.ok) throw new Error();
       shoppingItems = await res.json();
-    } catch {
-      shoppingItems = lsGet("shopping_local") || [];
-    }
+    } catch { shoppingItems = lsGet("shopping_local") || []; }
     renderShop();
   }
   async function saveShopping() {
     lsSet("shopping_local", shoppingItems);
     try {
-      await fetch("/api/shopping", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: shoppingItems })
-      });
+      await fetch("/api/shopping", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: shoppingItems }) });
     } catch {}
   }
   function addShopItem() {
@@ -397,35 +348,30 @@
     const item = shoppingItems.find(i => i.id === id);
     if (item) { item.done = !item.done; saveShopping(); renderShop(); }
   }
-  function deleteShopItem(id) {
-    shoppingItems = shoppingItems.filter(i => i.id !== id);
-    saveShopping(); renderShop();
-  }
-  function clearDoneItems() {
-    shoppingItems = shoppingItems.filter(i => !i.done);
-    saveShopping(); renderShop();
-  }
+  function deleteShopItem(id) { shoppingItems = shoppingItems.filter(i => i.id !== id); saveShopping(); renderShop(); }
+  function clearDoneItems() { shoppingItems = shoppingItems.filter(i => !i.done); saveShopping(); renderShop(); }
   function renderShop() {
     const list = document.getElementById("shop-list");
     const stats = document.getElementById("shop-stats");
     const open = shoppingItems.filter(i => !i.done).length;
     const done = shoppingItems.filter(i => i.done).length;
     stats.textContent = open + " offen" + (done > 0 ? " · " + done + " erledigt" : "");
-    if (shoppingItems.length === 0) { list.innerHTML = `<div class="shop-empty">Liste ist leer 🎉</div>`; return; }
+    if (shoppingItems.length === 0) { list.innerHTML = '<div class="shop-empty">Liste ist leer 🎉</div>'; return; }
     const sorted = [...shoppingItems.filter(i => !i.done), ...shoppingItems.filter(i => i.done)];
-    list.innerHTML = sorted.map(item => `
-      <div class="shop-item${item.done ? " done" : ""}">
-        <button class="shop-check${item.done ? " checked" : ""}" onclick="toggleShopItem(${item.id})">${item.done ? "✓" : ""}</button>
-        <span class="shop-text${item.done ? " done-text" : ""}">${escHtml(item.text)}</span>
-        ${item.qty ? `<span class="shop-qty">${escHtml(item.qty)}</span>` : ""}
-        <button class="shop-del" onclick="deleteShopItem(${item.id})">×</button>
-      </div>`).join("");
+    list.innerHTML = sorted.map(item =>
+      '<div class="shop-item' + (item.done ? " done" : "") + '">' +
+      '<button class="shop-check' + (item.done ? " checked" : "") + '" onclick="toggleShopItem(' + item.id + ')">' + (item.done ? "✓" : "") + '</button>' +
+      '<span class="shop-text' + (item.done ? " done-text" : "") + '">' + escHtml(item.text) + '</span>' +
+      (item.qty ? '<span class="shop-qty">' + escHtml(item.qty) + '</span>' : '') +
+      '<button class="shop-del" onclick="deleteShopItem(' + item.id + ')">×</button>' +
+      '</div>'
+    ).join("");
   }
   setInterval(loadShopping, 30 * 1000);
 
   function updateSyncRow() {
     const row = document.getElementById("sync-row");
-    if (calendars.length === 0) { row.innerHTML = `<div class="sync-dot"></div><span class="sync-label">Kein Kalender</span>`; return; }
+    if (calendars.length === 0) { row.innerHTML = '<div class="sync-dot"></div><span class="sync-label">Kein Kalender</span>'; return; }
     let html = "";
     for (const cal of calendars) {
       const dotColor = cal.status === "ok" ? cal.color : cal.status === "error" ? "#E07A5F" : "#8A8A9A";
@@ -433,9 +379,9 @@
         ? cal.name + " " + String(cal.lastSync.getHours()).padStart(2,"0") + ":" + String(cal.lastSync.getMinutes()).padStart(2,"0")
         : cal.status === "loading" ? cal.name + " lädt…"
         : cal.status === "error" ? cal.name + " ⚠️" : cal.name;
-      html += `<div class="sync-dot" style="background:${dotColor}"></div><span class="sync-label">${label}</span>`;
+      html += '<div class="sync-dot" style="background:' + dotColor + '"></div><span class="sync-label">' + label + '</span>';
     }
-    html += `<button class="refresh-btn" onclick="fetchAllCals()">↻</button>`;
+    html += '<button class="refresh-btn" onclick="fetchAllCals()">↻</button>';
     row.innerHTML = html;
   }
 
@@ -445,53 +391,42 @@
     return result;
   }
 
-  // Day popup
   function showDayPopup(dateKey, dayLabel) {
     const events = allEvents().filter(e => e.date === dateKey).sort((a,b) => (a.time||"").localeCompare(b.time||""));
     document.getElementById("popup-title").textContent = dayLabel;
-    document.getElementById("popup-events").innerHTML = events.map(ev => `
-      <div class="popup-event" style="border-left-color:${ev.calColor}">
-        ${ev.time ? `<span class="popup-event-time" style="color:${ev.calColor}">${ev.time}</span>` : ""}
-        <span class="popup-event-title">${escHtml(ev.title)}</span>
-      </div>`).join("");
+    document.getElementById("popup-events").innerHTML = events.map(ev =>
+      '<div class="popup-event" style="border-left-color:' + ev.calColor + '">' +
+      (ev.time ? '<span class="popup-event-time" style="color:' + ev.calColor + '">' + ev.time + '</span>' : '') +
+      '<span class="popup-event-title">' + escHtml(ev.title) + '</span>' +
+      '</div>'
+    ).join("");
     document.getElementById("day-popup").style.display = "flex";
   }
-  function closeDayPopup(e) {
-    if (e.target === document.getElementById("day-popup"))
-      document.getElementById("day-popup").style.display = "none";
-  }
+  function closeDayPopup(e) { if (e.target === document.getElementById("day-popup")) document.getElementById("day-popup").style.display = "none"; }
 
   function renderWeekBlock(offset, labelText, isCurrent) {
     const weekDates = getWeekDates(offset);
     const events = allEvents();
-    let html = `<div class="week-block">
-      <div class="week-label${isCurrent ? " current" : ""}">${labelText}</div>
-      <div class="day-grid">`;
+    let html = '<div class="week-block"><div class="week-label' + (isCurrent ? " current" : "") + '">' + labelText + '</div><div class="day-grid">';
     for (let i = 0; i < 7; i++) {
       const d = weekDates[i];
       const key = fmtDate(d);
       const today = isToday(d);
-      const tomorrow = isTomorrow(d);
       const dayEvs = events.filter(e => e.date === key).sort((a,b) => (a.time||"").localeCompare(b.time||""));
-      const shown = dayEvs.slice(0, MAX_EVENTS_PER_DAY);
+      const shown = dayEvs.slice(0, MAX_EV);
       const hidden = dayEvs.length - shown.length;
       const dayLabel = DAYS_LONG[i] + ", " + d.getDate() + ". " + MONTHS[d.getMonth()];
-      html += `<div class="day-col${today ? " today" : tomorrow ? " tomorrow" : ""}" onclick="showDayPopup('${key}','${dayLabel}')">
-        <div class="day-header">
-          <div class="day-name">${DAYS_SHORT[i]}</div>
-          <div class="day-num">${d.getDate()}</div>
-        </div>`;
+      html += '<div class="day-col' + (today ? " today" : "") + '" onclick="showDayPopup(\'' + key + '\',\'' + dayLabel + '\')">';
+      html += '<div class="day-header"><div class="day-name">' + DAYS_SHORT[i] + '</div><div class="day-num">' + d.getDate() + '</div></div>';
       for (const ev of shown) {
-        html += `<div class="event-chip" style="background:${ev.calColor}15;border-left:3px solid ${ev.calColor}">
-          ${ev.time ? `<span class="event-time" style="color:${ev.calColor}">${ev.time}</span>` : ""}
-          ${escHtml(ev.title)}</div>`;
+        html += '<div class="event-chip" style="background:' + ev.calColor + '15;border-left:3px solid ' + ev.calColor + '">';
+        if (ev.time) html += '<span class="event-time" style="color:' + ev.calColor + '">' + ev.time + '</span>';
+        html += escHtml(ev.title) + '</div>';
       }
-      if (hidden > 0) {
-        html += `<div class="more-badge">+${hidden} weitere</div>`;
-      }
-      html += `</div>`;
+      if (hidden > 0) html += '<div class="more-badge">+' + hidden + ' weitere</div>';
+      html += '</div>';
     }
-    html += `</div></div>`;
+    html += '</div></div>';
     return html;
   }
 
@@ -507,43 +442,35 @@
     const panel = document.getElementById("cal-scroll");
     const events = allEvents();
     let html = "";
-
     if (currentTab === "week") {
       html += renderWeekBlock(0, "Diese Woche", true);
       html += renderWeekBlock(1, "Nächste Woche", false);
     }
-
     if (currentTab === "upcoming") {
       const today = fmtDate(new Date());
       const upcoming = events.filter(e => e.date >= today)
         .sort((a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||""))
         .slice(0, 15);
-      html += `<div class="section-title">Bevorstehende Termine</div>`;
+      html += '<div class="section-title">Bevorstehende Termine</div>';
       if (upcoming.length === 0) {
-        html += `<div class="no-events">Keine bevorstehenden Termine</div>`;
+        html += '<div class="no-events">Keine bevorstehenden Termine</div>';
       } else {
-        html += `<div class="upcoming-list">`;
+        html += '<div class="upcoming-list">';
         for (const ev of upcoming) {
           const d = new Date(ev.date + "T12:00:00");
           const di = d.getDay() === 0 ? 6 : d.getDay() - 1;
           const dateStr = DAYS_SHORT[di] + " " + d.getDate() + ". " + MONTHS_SHORT[d.getMonth()];
           const hl = ev.date === today || isTomorrow(d);
-          const badge = ev.date === today ? `<span class="badge badge-green">Heute</span>`
-            : isTomorrow(d) ? `<span class="badge badge-blue">Morgen</span>` : "";
-          html += `<div class="upcoming-item${hl ? " highlight" : ""}">
-            <div class="upcoming-date">
-              <div class="upcoming-date-label" style="color:${ev.calColor}">${dateStr}</div>
-              ${ev.time ? `<div class="upcoming-time-label">${ev.time}</div>` : ""}
-            </div>
-            <div class="upcoming-divider" style="background:${ev.calColor}44"></div>
-            <div class="upcoming-title${hl ? " bold" : ""}">${escHtml(ev.title)}</div>
-            ${badge}
-          </div>`;
+          const badge = ev.date === today ? '<span class="badge badge-green">Heute</span>' : isTomorrow(d) ? '<span class="badge badge-blue">Morgen</span>' : "";
+          html += '<div class="upcoming-item' + (hl ? " highlight" : "") + '">';
+          html += '<div class="upcoming-date"><div class="upcoming-date-label" style="color:' + ev.calColor + '">' + dateStr + '</div>';
+          if (ev.time) html += '<div class="upcoming-time-label">' + ev.time + '</div>';
+          html += '</div><div class="upcoming-divider" style="background:' + ev.calColor + '44"></div>';
+          html += '<div class="upcoming-title' + (hl ? " bold" : "") + '">' + escHtml(ev.title) + '</div>' + badge + '</div>';
         }
-        html += `</div>`;
+        html += '</div>';
       }
     }
-
     panel.innerHTML = html;
   }
 
@@ -556,61 +483,48 @@
     document.getElementById("new-cal-url").value = "";
     document.getElementById("settings-modal").style.display = "flex";
   }
-  function closeSettingsOverlay(e) {
-    if (e.target === document.getElementById("settings-modal"))
-      document.getElementById("settings-modal").style.display = "none";
-  }
+  function closeSettingsOverlay(e) { if (e.target === document.getElementById("settings-modal")) document.getElementById("settings-modal").style.display = "none"; }
   function renderCalList() {
     const list = document.getElementById("cal-list");
-    if (calendars.length === 0) { list.innerHTML = `<p style="font-size:12px;color:#8A8A9A">Noch keine Kalender.</p>`; return; }
-    list.innerHTML = calendars.map((cal, i) => `
-      <div class="cal-item">
-        <div class="cal-dot" style="background:${cal.color}"></div>
-        <div style="flex:1">
-          <div class="cal-name">${escHtml(cal.name)}</div>
-          <div class="cal-status">${cal.status === "ok" ? "✓ " + cal.events.length + " Termine" : cal.status === "error" ? "⚠️ Fehler" : cal.status === "loading" ? "⏳ Lädt…" : "Nicht geladen"}</div>
-        </div>
-        <button class="btn-danger" onclick="removeCal(${i})">Entfernen</button>
-      </div>`).join("");
+    if (calendars.length === 0) { list.innerHTML = '<p style="font-size:12px;color:#8A8A9A">Noch keine Kalender.</p>'; return; }
+    list.innerHTML = calendars.map((cal, i) =>
+      '<div class="cal-item">' +
+      '<div class="cal-dot" style="background:' + cal.color + '"></div>' +
+      '<div style="flex:1"><div class="cal-name">' + escHtml(cal.name) + '</div>' +
+      '<div class="cal-status">' + (cal.status === "ok" ? "✓ " + cal.events.length + " Termine" : cal.status === "error" ? "⚠️ Fehler" : cal.status === "loading" ? "⏳ Lädt…" : "Nicht geladen") + '</div></div>' +
+      '<button class="btn-danger" onclick="removeCal(' + i + ')">Entfernen</button></div>'
+    ).join("");
   }
   async function addCalendar() {
     const name = document.getElementById("new-cal-name").value.trim();
     const url = document.getElementById("new-cal-url").value.trim();
-    if (!name || !url) { document.getElementById("settings-status").innerHTML = `<p class="status-error">Bitte Name und URL eingeben.</p>`; return; }
+    if (!name || !url) { document.getElementById("settings-status").innerHTML = '<p class="status-error">Bitte Name und URL eingeben.</p>'; return; }
     const color = CAL_COLORS[calendars.length % CAL_COLORS.length];
     const cal = { id: "cal_" + Date.now(), name, url, color, events: [], status: "", lastSync: null };
     calendars.push(cal); saveCals();
-    document.getElementById("settings-status").innerHTML = `<p class="status-loading">⏳ Wird geladen…</p>`;
+    document.getElementById("settings-status").innerHTML = '<p class="status-loading">⏳ Wird geladen…</p>';
     renderCalList();
     await fetchCal(cal);
     document.getElementById("settings-status").innerHTML = cal.status === "ok"
-      ? `<p class="status-ok">✓ ${cal.events.length} Termine geladen</p>`
-      : `<p class="status-error">⚠️ Laden fehlgeschlagen</p>`;
+      ? '<p class="status-ok">✓ ' + cal.events.length + ' Termine geladen</p>'
+      : '<p class="status-error">⚠️ Laden fehlgeschlagen</p>';
     renderCalList(); renderCal();
   }
   function removeCal(i) { calendars.splice(i, 1); saveCals(); renderCalList(); updateSyncRow(); renderCal(); }
 
-  loadCals(); updateSyncRow(); renderCal(); renderShop();
-  if (calendars.length > 0) fetchAllCals();
-  loadShopping();
-
-  // ── Weather (Open-Meteo, Sindelfingen) ────────────────────────────────────
+  // Weather
   const WX_LAT = 48.7058, WX_LON = 9.0053;
-  const DAYS_SHORT_WX = ["So","Mo","Di","Mi","Do","Fr","Sa"];
-
   function wxCode(code, isDay) {
     if (code === 0) return isDay ? "☀️" : "🌙";
-    if (code <= 2) return isDay ? "⛅" : "☁️";
+    if (code <= 2) return "⛅";
     if (code === 3) return "☁️";
     if (code <= 49) return "🌫️";
     if (code <= 59) return "🌦️";
     if (code <= 69) return "🌧️";
     if (code <= 79) return "🌨️";
     if (code <= 84) return "🌧️";
-    if (code <= 94) return "⛈️";
-    return "🌩️";
+    return "⛈️";
   }
-
   function wxDesc(code) {
     if (code === 0) return "Klarer Himmel";
     if (code === 1) return "Überwiegend klar";
@@ -621,72 +535,51 @@
     if (code <= 69) return "Regen";
     if (code <= 79) return "Schnee";
     if (code <= 84) return "Schauer";
-    if (code <= 99) return "Gewitter";
-    return "–";
+    return "Gewitter";
   }
-
   async function loadWeather() {
     try {
-      const url = "https://api.open-meteo.com/v1/forecast?latitude=" + WX_LAT +
-        "&longitude=" + WX_LON +
+      const url = "https://api.open-meteo.com/v1/forecast?latitude=" + WX_LAT + "&longitude=" + WX_LON +
         "&current=temperature_2m,weathercode,windspeed_10m,is_day" +
-        "&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max" +
+        "&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
         "&timezone=Europe%2FBerlin&forecast_days=6";
       const res = await fetch(url);
       if (!res.ok) throw new Error();
       const d = await res.json();
-      renderWeather(d);
+      const cur = d.current;
+      const daily = d.daily;
+      const isDay = cur.is_day === 1;
+      let html = '<div class="wx-now">';
+      html += '<div class="wx-icon">' + wxCode(cur.weathercode, isDay) + '</div>';
+      html += '<div>';
+      html += '<div class="wx-temp-big">' + Math.round(cur.temperature_2m) + '°</div>';
+      html += '<div class="wx-desc">' + wxDesc(cur.weathercode) + '</div>';
+      html += '<div class="wx-temp-range">↑' + Math.round(daily.temperature_2m_max[0]) + '° ↓' + Math.round(daily.temperature_2m_min[0]) + '°</div>';
+      html += '<div class="wx-details"><span>💧 ' + daily.precipitation_probability_max[0] + '%</span><span>💨 ' + Math.round(cur.windspeed_10m) + ' km/h</span></div>';
+      html += '</div></div>';
+      html += '<div class="wx-forecast">';
+      for (let i = 1; i <= 5; i++) {
+        const date = new Date(daily.time[i] + "T12:00:00");
+        html += '<div class="wx-day">';
+        html += '<div class="wx-day-name">' + DAYS_SHORT_WX[date.getDay()] + '</div>';
+        html += '<div class="wx-day-icon">' + wxCode(daily.weathercode[i], true) + '</div>';
+        html += '<div class="wx-day-max">' + Math.round(daily.temperature_2m_max[i]) + '°</div>';
+        html += '<div class="wx-day-min">' + Math.round(daily.temperature_2m_min[i]) + '°</div>';
+        html += '<div class="wx-day-rain">💧' + daily.precipitation_probability_max[i] + '%</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+      document.getElementById("weather-strip").innerHTML = html;
     } catch {
       document.getElementById("weather-strip").innerHTML = '<span class="wx-loading">⚠️ Wetter nicht verfügbar</span>';
     }
   }
-
-  function renderWeather(d) {
-    const cur = d.current;
-    const daily = d.daily;
-    const isDay = cur.is_day === 1;
-    const icon = wxCode(cur.weathercode, isDay);
-    const desc = wxDesc(cur.weathercode);
-    const temp = Math.round(cur.temperature_2m);
-    const wind = Math.round(cur.windspeed_10m);
-    const tmax = Math.round(daily.temperature_2m_max[0]);
-    const tmin = Math.round(daily.temperature_2m_min[0]);
-    const rain = daily.precipitation_probability_max[0];
-
-    let html = '<div class="wx-now">';
-    html += '<div class="wx-icon">' + icon + '</div>';
-    html += '<div>';
-    html += '<div class="wx-temp-big">' + temp + '°</div>';
-    html += '<div class="wx-desc">' + desc + '</div>';
-    html += '<div class="wx-temp-range">↑' + tmax + '° ↓' + tmin + '°</div>';
-    html += '<div class="wx-details"><span>💧 ' + rain + '%</span><span>💨 ' + wind + ' km/h</span></div>';
-    html += '</div></div>';
-
-    html += '<div class="wx-forecast">';
-    for (let i = 1; i <= 5; i++) {
-      const date = new Date(daily.time[i] + "T12:00:00");
-      const dayName = DAYS_SHORT_WX[date.getDay()];
-      const dayIcon = wxCode(daily.weathercode[i], true);
-      const dayMax = Math.round(daily.temperature_2m_max[i]);
-      const dayMin = Math.round(daily.temperature_2m_min[i]);
-      const dayRain = daily.precipitation_probability_max[i];
-      html += '<div class="wx-day">';
-      html += '<div class="wx-day-name">' + dayName + '</div>';
-      html += '<div class="wx-day-icon">' + dayIcon + '</div>';
-      html += '<div class="wx-day-max">' + dayMax + '°</div>';
-      html += '<div class="wx-day-min">' + dayMin + '°</div>';
-      html += '<div class="wx-day-rain">💧' + dayRain + '%</div>';
-      html += '</div>';
-    }
-    html += '</div>';
-
-    document.getElementById("weather-strip").innerHTML = html;
-  }
-
-  // Refresh weather every 15 minutes
   setInterval(loadWeather, 15 * 60 * 1000);
   loadWeather();
 
+  loadCals(); updateSyncRow(); renderCal(); renderShop();
+  if (calendars.length > 0) fetchAllCals();
+  loadShopping();
 </script>
 </body>
 </html>
