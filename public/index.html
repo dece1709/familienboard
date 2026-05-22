@@ -25,9 +25,9 @@
     #app { display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; min-height: 100dvh; padding-bottom: 76px; }
 
     #header {
-      padding: 12px 20px 10px; border-bottom: 1px solid #E8E4DC;
+      padding: 10px 16px 10px 20px; border-bottom: 1px solid #E8E4DC;
       background: #F7F4EF; position: sticky; top: 0; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
     .logo { font-family: 'Playfair Display', serif; font-size: 24px; color: #1A1A2E; font-weight: 700; }
     .logo span { color: #2D6A4F; }
@@ -118,8 +118,8 @@
     .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 14px; }
 
     /* Tab bar */
-    #tabbar { background: rgba(247,244,239,0.97); border-top: 1px solid #E8E4DC; display: flex; padding: 7px 14px 9px; gap: 8px; flex-shrink: 0; }
-    .tab-btn { flex: 1; min-height: 44px; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; color: #8A8A9A; background: transparent; }
+    #tabbar { display: flex; gap: 6px; flex-shrink: 0; }
+    .tab-btn { min-height: 36px; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; color: #8A8A9A; background: transparent; padding: 0 16px; }
     .tab-btn.active { background: #2D6A4F; color: #fff; }
 
     /* Modal */
@@ -197,6 +197,10 @@
       <div class="logo">Familien<span>board</span></div>
       <div class="sync-row" id="sync-row"></div>
     </div>
+    <div id="tabbar">
+      <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Woche</button>
+      <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
+    </div>
     <div style="display:flex;align-items:center;gap:10px">
       <div id="clock">
         <div id="clock-time"><span id="ch">00</span><span class="colon">:</span><span id="cm">00</span></div>
@@ -209,10 +213,6 @@
   <div id="main">
     <div id="cal-panel">
       <div id="cal-scroll"></div>
-      <div id="tabbar">
-        <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Diese & nächste Woche</button>
-        <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
-      </div>
     </div>
     <div id="shop-panel">
       <div class="shop-header">
