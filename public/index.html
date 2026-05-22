@@ -22,7 +22,7 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-thumb { background: #E8E4DC; border-radius: 4px; }
 
-    #app { display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; min-height: 100dvh; padding-bottom: 68px; }
+    #app { display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; min-height: 100dvh; padding-bottom: 148px; }
 
     #header {
       padding: 12px 20px 10px; border-bottom: 1px solid #E8E4DC;
@@ -117,7 +117,7 @@
     .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 14px; }
 
     /* Tab bar */
-    #tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1400px; background: rgba(247,244,239,0.97); border-top: 1px solid #E8E4DC; display: flex; padding: 7px 14px 11px; gap: 8px; z-index: 20; }
+    #tabbar { position: fixed; bottom: 76px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1400px; background: rgba(247,244,239,0.97); border-top: 1px solid #E8E4DC; border-bottom: 1px solid #E8E4DC; display: flex; padding: 7px 14px 11px; gap: 8px; z-index: 20; }
     .tab-btn { flex: 1; min-height: 44px; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; color: #8A8A9A; background: transparent; }
     .tab-btn.active { background: #2D6A4F; color: #fff; }
 
@@ -152,6 +152,41 @@
     .popup-event-time { font-size: 11px; font-weight: 700; }
     .popup-event-title { font-size: 14px; color: #1A1A2E; }
     .popup-close { background: #F7F4EF; border: none; border-radius: 9px; padding: 9px; font-size: 13px; font-weight: 700; color: #8A8A9A; }
+
+    /* Weather strip */
+    #weather-strip {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 1400px;
+      padding: 8px 16px 8px;
+      border-top: 1px solid #E8E4DC;
+      background: rgba(247,244,239,0.97);
+      display: flex; gap: 10px; align-items: stretch;
+      z-index: 15;
+    }
+    .wx-now {
+      background: #fff; border: 1.5px solid #E8E4DC; border-radius: 12px;
+      padding: 10px 14px; display: flex; align-items: center; gap: 12px;
+      flex-shrink: 0; min-width: 200px;
+    }
+    .wx-icon { font-size: 36px; line-height: 1; }
+    .wx-temp-big { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #1A1A2E; line-height: 1; }
+    .wx-temp-range { font-size: 11px; color: #8A8A9A; margin-top: 2px; }
+    .wx-desc { font-size: 12px; color: #1A1A2E; font-weight: 600; margin-top: 1px; }
+    .wx-details { font-size: 11px; color: #8A8A9A; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .wx-forecast {
+      flex: 1; display: flex; gap: 6px; overflow: hidden;
+    }
+    .wx-day {
+      flex: 1; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 10px;
+      padding: 7px 6px; display: flex; flex-direction: column; align-items: center;
+      gap: 3px; min-width: 0;
+    }
+    .wx-day-name { font-size: 10px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.4px; }
+    .wx-day-icon { font-size: 20px; line-height: 1; }
+    .wx-day-max { font-size: 14px; font-weight: 700; color: #1A1A2E; }
+    .wx-day-min { font-size: 11px; color: #8A8A9A; }
+    .wx-day-rain { font-size: 10px; color: #1A73E8; font-weight: 600; }
+    .wx-loading { color: #8A8A9A; font-size: 12px; padding: 8px; }
   </style>
 </head>
 <body>
@@ -192,11 +227,14 @@
     </div>
   </div>
 
+
   <div id="tabbar">
     <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Diese & nächste Woche</button>
     <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
   </div>
 </div>
+
+  <div id="weather-strip"><span class="wx-loading">⏳ Wetter wird geladen…</span></div>
 
 <!-- Settings Modal -->
 <div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettingsOverlay(event)">
@@ -551,8 +589,100 @@
   loadCals(); updateSyncRow(); renderCal(); renderShop();
   if (calendars.length > 0) fetchAllCals();
   loadShopping();
+
+  // ── Weather (Open-Meteo, Sindelfingen) ────────────────────────────────────
+  const WX_LAT = 48.7058, WX_LON = 9.0053;
+  const DAYS_SHORT_WX = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+
+  function wxCode(code, isDay) {
+    if (code === 0) return isDay ? "☀️" : "🌙";
+    if (code <= 2) return isDay ? "⛅" : "☁️";
+    if (code === 3) return "☁️";
+    if (code <= 49) return "🌫️";
+    if (code <= 59) return "🌦️";
+    if (code <= 69) return "🌧️";
+    if (code <= 79) return "🌨️";
+    if (code <= 84) return "🌧️";
+    if (code <= 94) return "⛈️";
+    return "🌩️";
+  }
+
+  function wxDesc(code) {
+    if (code === 0) return "Klarer Himmel";
+    if (code === 1) return "Überwiegend klar";
+    if (code === 2) return "Teilweise bewölkt";
+    if (code === 3) return "Bedeckt";
+    if (code <= 49) return "Nebel";
+    if (code <= 59) return "Nieselregen";
+    if (code <= 69) return "Regen";
+    if (code <= 79) return "Schnee";
+    if (code <= 84) return "Schauer";
+    if (code <= 99) return "Gewitter";
+    return "–";
+  }
+
+  async function loadWeather() {
+    try {
+      const url = "https://api.open-meteo.com/v1/forecast?latitude=" + WX_LAT +
+        "&longitude=" + WX_LON +
+        "&current=temperature_2m,weathercode,windspeed_10m,is_day" +
+        "&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max" +
+        "&timezone=Europe%2FBerlin&forecast_days=6";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      renderWeather(d);
+    } catch {
+      document.getElementById("weather-strip").innerHTML = '<span class="wx-loading">⚠️ Wetter nicht verfügbar</span>';
+    }
+  }
+
+  function renderWeather(d) {
+    const cur = d.current;
+    const daily = d.daily;
+    const isDay = cur.is_day === 1;
+    const icon = wxCode(cur.weathercode, isDay);
+    const desc = wxDesc(cur.weathercode);
+    const temp = Math.round(cur.temperature_2m);
+    const wind = Math.round(cur.windspeed_10m);
+    const tmax = Math.round(daily.temperature_2m_max[0]);
+    const tmin = Math.round(daily.temperature_2m_min[0]);
+    const rain = daily.precipitation_probability_max[0];
+
+    let html = '<div class="wx-now">';
+    html += '<div class="wx-icon">' + icon + '</div>';
+    html += '<div>';
+    html += '<div class="wx-temp-big">' + temp + '°</div>';
+    html += '<div class="wx-desc">' + desc + '</div>';
+    html += '<div class="wx-temp-range">↑' + tmax + '° ↓' + tmin + '°</div>';
+    html += '<div class="wx-details"><span>💧 ' + rain + '%</span><span>💨 ' + wind + ' km/h</span></div>';
+    html += '</div></div>';
+
+    html += '<div class="wx-forecast">';
+    for (let i = 1; i <= 5; i++) {
+      const date = new Date(daily.time[i] + "T12:00:00");
+      const dayName = DAYS_SHORT_WX[date.getDay()];
+      const dayIcon = wxCode(daily.weathercode[i], true);
+      const dayMax = Math.round(daily.temperature_2m_max[i]);
+      const dayMin = Math.round(daily.temperature_2m_min[i]);
+      const dayRain = daily.precipitation_probability_max[i];
+      html += '<div class="wx-day">';
+      html += '<div class="wx-day-name">' + dayName + '</div>';
+      html += '<div class="wx-day-icon">' + dayIcon + '</div>';
+      html += '<div class="wx-day-max">' + dayMax + '°</div>';
+      html += '<div class="wx-day-min">' + dayMin + '°</div>';
+      html += '<div class="wx-day-rain">💧' + dayRain + '%</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+
+    document.getElementById("weather-strip").innerHTML = html;
+  }
+
+  // Refresh weather every 15 minutes
+  setInterval(loadWeather, 15 * 60 * 1000);
+  loadWeather();
+
 </script>
 </body>
 </html>
-
-
