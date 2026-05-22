@@ -1,1 +1,16 @@
+{
+  "name": "Familienboard",
+  "short_name": "Familienboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F4EF",
+  "theme_color": "#2D6A4F",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/2D6A4F/ffffff?text=FB",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
 
