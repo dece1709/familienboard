@@ -6,6 +6,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="manifest" href="/manifest.json" />
   <title>Familienboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -23,14 +24,11 @@
     button { touch-action: manipulation; font-family: 'DM Sans', sans-serif; cursor: pointer; }
     input { font-family: 'DM Sans', sans-serif; user-select: text; -webkit-user-select: text; }
     @keyframes blink { 50% { opacity: 0.2; } }
-    @keyframes spin { to { transform: rotate(360deg); } }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-thumb { background: #E8E4DC; border-radius: 4px; }
 
-    /* Layout */
     #app { display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; min-height: 100dvh; padding-bottom: 68px; }
 
-    /* Header */
     #header {
       padding: 16px 24px 12px;
       border-bottom: 1px solid #E8E4DC;
@@ -40,14 +38,13 @@
     }
     .logo { font-family: 'Playfair Display', serif; font-size: 28px; color: #1A1A2E; font-weight: 700; }
     .logo span { color: #2D6A4F; }
-    .sync-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
-    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #8A8A9A; }
+    .sync-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #8A8A9A; flex-shrink: 0; }
     .sync-dot.ok { background: #2D6A4F; }
     .sync-dot.error { background: #E07A5F; }
     .sync-label { font-size: 12px; color: #8A8A9A; }
     .refresh-btn { background: none; border: none; color: #8A8A9A; font-size: 16px; padding: 0 4px; }
 
-    /* Clock */
     #clock { text-align: right; }
     #clock-time { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: #1A1A2E; line-height: 1; }
     #clock-time .colon { animation: blink 1s step-end infinite; }
@@ -58,10 +55,8 @@
       display: flex; align-items: center; justify-content: center;
     }
 
-    /* Content */
     #content { flex: 1; padding: 20px 24px; overflow-y: auto; }
 
-    /* Empty state */
     .empty-state {
       background: #fff; border: 1.5px solid #E8E4DC; border-radius: 16px;
       padding: 32px; text-align: center; margin-bottom: 20px;
@@ -74,12 +69,10 @@
       border-radius: 12px; padding: 12px 24px; font-size: 15px; font-weight: 700;
     }
 
-    /* Week nav */
     .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .week-nav button { background: none; border: none; font-size: 26px; color: #8A8A9A; padding: 4px 14px; border-radius: 8px; }
     .week-nav span { font-family: 'Playfair Display', serif; font-size: 18px; color: #8A8A9A; }
 
-    /* Day grid */
     .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
     .day-col {
       background: #fff; border: 2px solid #E8E4DC; border-radius: 16px;
@@ -97,33 +90,28 @@
     .day-col.today .day-num { background: #2D6A4F; color: #fff; }
     .day-col.today .day-name { color: #2D6A4F; }
     .event-chip {
-      background: #1A73E815; border-left: 3px solid #1A73E8;
       border-radius: 7px; padding: 4px 5px; font-size: 11px;
       color: #1A1A2E; word-break: break-word; line-height: 1.4;
     }
-    .event-time { color: #1A73E8; font-weight: 700; font-size: 10px; display: block; }
+    .event-time { font-weight: 700; font-size: 10px; display: block; }
 
-    /* Upcoming list */
     .upcoming-list { display: flex; flex-direction: column; gap: 8px; }
     .upcoming-item {
-      display: flex; align-items: center; gap: 12;
+      display: flex; align-items: center; gap: 12px;
       background: #fff; border: 1.5px solid #E8E4DC;
       border-radius: 12px; padding: 12px 14px;
     }
     .upcoming-item.highlight { background: #1A73E810; border-color: #1A73E844; }
-    .upcoming-date { min-width: 68px; text-align: center; }
-    .upcoming-date-label { font-size: 12px; font-weight: 700; color: #1A73E8; }
+    .upcoming-date { min-width: 68px; text-align: center; flex-shrink: 0; }
+    .upcoming-date-label { font-size: 12px; font-weight: 700; }
     .upcoming-time-label { font-size: 11px; color: #8A8A9A; }
-    .upcoming-divider { width: 2px; height: 32px; background: #1A73E844; border-radius: 2px; flex-shrink: 0; }
+    .upcoming-divider { width: 2px; height: 32px; border-radius: 2px; flex-shrink: 0; }
     .upcoming-title { flex: 1; font-size: 15px; color: #1A1A2E; }
     .upcoming-title.bold { font-weight: 600; }
-    .badge {
-      font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px;
-    }
+    .badge { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; }
     .badge-green { color: #2D6A4F; background: #2D6A4F18; }
     .badge-blue { color: #1A73E8; background: #1A73E818; }
 
-    /* Tab bar */
     #tabbar {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 1200px;
@@ -131,21 +119,17 @@
       border-top: 1px solid #E8E4DC;
       display: flex; padding: 8px 16px 12px; gap: 8px; z-index: 20;
     }
-    .tab-btn {
-      flex: 1; min-height: 48px; border: none; border-radius: 14px;
-      font-size: 14px; font-weight: 700; color: #8A8A9A; background: transparent;
-    }
+    .tab-btn { flex: 1; min-height: 48px; border: none; border-radius: 14px; font-size: 14px; font-weight: 700; color: #8A8A9A; background: transparent; }
     .tab-btn.active { background: #2D6A4F; color: #fff; }
 
-    /* Modal */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.5);
       display: flex; align-items: center; justify-content: center; z-index: 100;
     }
     .modal {
       background: #fff; border-radius: 20px; padding: 28px;
-      width: min(560px, 90vw); display: flex; flex-direction: column; gap: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      width: min(580px, 92vw); display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;
     }
     .modal h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: #1A1A2E; }
     .modal label { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
@@ -155,20 +139,24 @@
     }
     .modal input:focus { outline: 2px solid #2D6A4F44; }
     .modal-hint { font-size: 12px; color: #8A8A9A; margin-top: 4px; line-height: 1.6; }
-    .modal-actions { display: flex; gap: 10px; }
+    .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .modal-actions .btn-primary { flex: 1; }
-    .btn-ghost {
-      background: #F7F4EF; color: #1A1A2E; border: 1.5px solid #E8E4DC;
-      border-radius: 12px; padding: 12px 20px; font-size: 15px;
-    }
+    .btn-ghost { background: #F7F4EF; color: #1A1A2E; border: 1.5px solid #E8E4DC; border-radius: 12px; padding: 12px 20px; font-size: 15px; }
+    .btn-danger { background: none; border: 1.5px solid #E07A5F; color: #E07A5F; border-radius: 10px; padding: 6px 12px; font-size: 13px; }
     .status-ok { font-size: 13px; color: #2D6A4F; }
     .status-error { font-size: 13px; color: #E07A5F; }
     .status-loading { font-size: 13px; color: #8A8A9A; }
-    .info-box { background: #F7F4EF; border: 1px solid #E8E4DC; border-radius: 12px; padding: 14px; }
-    .info-box h3 { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .info-box p { font-size: 13px; color: #8A8A9A; line-height: 1.6; }
+    .cal-list { display: flex; flex-direction: column; gap: 10px; }
+    .cal-item {
+      display: flex; align-items: center; gap: 10px;
+      background: #FAFAF8; border: 1.5px solid #E8E4DC; border-radius: 12px; padding: 10px 12px;
+    }
+    .cal-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .cal-name { flex: 1; font-size: 14px; color: #1A1A2E; font-weight: 600; }
+    .cal-status { font-size: 11px; color: #8A8A9A; }
     .section-title { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; margin-bottom: 12px; }
     .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 15px; }
+    .divider { border: none; border-top: 1px solid #E8E4DC; margin: 4px 0; }
   </style>
 </head>
 <body>
@@ -176,11 +164,7 @@
   <div id="header">
     <div>
       <div class="logo">Familien<span>board</span></div>
-      <div class="sync-row">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span class="sync-label" id="sync-label">Kein Kalender</span>
-        <button class="refresh-btn" onclick="manualRefresh()">↻</button>
-      </div>
+      <div class="sync-row" id="sync-row"></div>
     </div>
     <div style="display:flex;align-items:center;gap:14px">
       <div id="clock">
@@ -200,23 +184,29 @@
 </div>
 
 <!-- Settings Modal -->
-<div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettings(event)">
+<div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettingsOverlay(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h2>Einstellungen</h2>
+
+    <!-- Calendar list -->
     <div>
-      <label>Kalender .ics-Link</label>
-      <input type="url" id="ics-input" placeholder="https://calendar.google.com/calendar/ical/…" />
-      <p class="modal-hint">Google Kalender → ⋮ → Einstellungen und Freigabe → „Öffentliche URL im iCal-Format"</p>
+      <label>Kalender</label>
+      <div class="cal-list" id="cal-list"></div>
+    </div>
+
+    <!-- Add calendar -->
+    <hr class="divider" />
+    <div>
+      <label>Neuen Kalender hinzufügen</label>
+      <input type="text" id="new-cal-name" placeholder="Name (z.B. Familie, Geburtstage)" style="margin-bottom:8px" />
+      <input type="url" id="new-cal-url" placeholder="https://calendar.google.com/calendar/ical/…" />
+      <p class="modal-hint">Google Kalender → ⋮ → Einstellungen → „Öffentliche URL im iCal-Format"</p>
     </div>
     <div class="modal-actions">
-      <button class="btn-primary" onclick="saveAndFetch()">Speichern & laden</button>
+      <button class="btn-primary" onclick="addCalendar()">Hinzufügen & laden</button>
       <button class="btn-ghost" onclick="document.getElementById('settings-modal').style.display='none'">Schließen</button>
     </div>
     <div id="settings-status"></div>
-    <div class="info-box">
-      <h3>Automatische Aktualisierung</h3>
-      <p>Der Kalender wird alle 5 Minuten automatisch aktualisiert. Neue Termine erscheinen ohne manuelle Aktion.</p>
-    </div>
   </div>
 </div>
 
@@ -226,16 +216,34 @@
   const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
   const MONTHS_SHORT = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
 
+  // Calendar colors
+  const CAL_COLORS = ["#1A73E8","#2D6A4F","#C77DFF","#E07A5F","#F4A261","#2A9D8F","#E76F51"];
+
   let currentTab = "week";
   let weekOffset = 0;
-  let icsEvents = [];
-  let icsUrl = "";
-  let syncStatus = "";
-  let lastSync = null;
+
+  // calendars: [{id, name, url, color, events, status, lastSync}]
+  let calendars = [];
 
   // ── Storage ────────────────────────────────────────────────────────────────
   function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
   function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
+
+  function saveCals() {
+    lsSet("calendars_v2", calendars.map(c => ({ id: c.id, name: c.name, url: c.url, color: c.color })));
+  }
+
+  function loadCals() {
+    // Migrate from old single-cal storage
+    const old = lsGet("cal_ics");
+    const saved = lsGet("calendars_v2");
+    if (saved && saved.length > 0) {
+      calendars = saved.map((c, i) => ({ ...c, events: [], status: "", lastSync: null }));
+    } else if (old) {
+      calendars = [{ id: "cal_0", name: "Familienkalender", url: old, color: CAL_COLORS[0], events: [], status: "", lastSync: null }];
+      saveCals();
+    }
+  }
 
   // ── Clock ──────────────────────────────────────────────────────────────────
   function updateClock() {
@@ -293,45 +301,61 @@
     return events;
   }
 
-  // ── Fetch ics ──────────────────────────────────────────────────────────────
-  async function fetchIcs(url) {
-    if (!url) return;
-    setSyncStatus("loading");
+  // ── Fetch one calendar ─────────────────────────────────────────────────────
+  async function fetchCal(cal) {
+    cal.status = "loading";
+    updateSyncRow();
     try {
-      const httpUrl = url.replace(/^webcal:\/\//i, "https://");
-      // Use our own Vercel proxy endpoint
+      const httpUrl = cal.url.replace(/^webcal:\/\//i, "https://");
       const res = await fetch("/api/ics?url=" + encodeURIComponent(httpUrl));
-      if (!res.ok) throw new Error("Status " + res.status);
+      if (!res.ok) throw new Error();
       const text = await res.text();
-      icsEvents = parseIcs(text);
-      lastSync = new Date();
-      setSyncStatus("ok");
-      render();
-    } catch(e) {
-      setSyncStatus("error");
+      cal.events = parseIcs(text);
+      cal.status = "ok";
+      cal.lastSync = new Date();
+    } catch {
+      cal.status = "error";
     }
+    updateSyncRow();
+    render();
   }
 
-  function setSyncStatus(status) {
-    syncStatus = status;
-    const dot = document.getElementById("sync-dot");
-    const label = document.getElementById("sync-label");
-    dot.className = "sync-dot " + (status === "ok" ? "ok" : status === "error" ? "error" : "");
-    if (status === "ok" && lastSync) {
-      label.textContent = "Sync " + String(lastSync.getHours()).padStart(2,"0") + ":" + String(lastSync.getMinutes()).padStart(2,"0");
-    } else if (status === "loading") {
-      label.textContent = "Lädt…";
-    } else if (status === "error") {
-      label.textContent = "Sync fehlgeschlagen";
-    } else {
-      label.textContent = "Kein Kalender";
-    }
-  }
-
-  function manualRefresh() { if (icsUrl) fetchIcs(icsUrl); }
+  function fetchAllCals() { calendars.forEach(fetchCal); }
 
   // Auto-refresh every 5 minutes
-  setInterval(() => { if (icsUrl) fetchIcs(icsUrl); }, 5 * 60 * 1000);
+  setInterval(fetchAllCals, 5 * 60 * 1000);
+
+  // ── Sync row ───────────────────────────────────────────────────────────────
+  function updateSyncRow() {
+    const row = document.getElementById("sync-row");
+    if (calendars.length === 0) {
+      row.innerHTML = `<div class="sync-dot"></div><span class="sync-label">Kein Kalender</span>`;
+      return;
+    }
+    let html = "";
+    for (const cal of calendars) {
+      const dotClass = cal.status === "ok" ? "ok" : cal.status === "error" ? "error" : "";
+      const label = cal.status === "ok" && cal.lastSync
+        ? cal.name + " " + String(cal.lastSync.getHours()).padStart(2,"0") + ":" + String(cal.lastSync.getMinutes()).padStart(2,"0")
+        : cal.status === "loading" ? cal.name + " lädt…"
+        : cal.status === "error" ? cal.name + " ⚠️"
+        : cal.name;
+      html += `<div class="sync-dot ${dotClass}" style="background:${cal.status === "ok" ? cal.color : cal.status === "error" ? "#E07A5F" : "#8A8A9A"}"></div><span class="sync-label">${label}</span>`;
+    }
+    html += `<button class="refresh-btn" onclick="fetchAllCals()">↻</button>`;
+    row.innerHTML = html;
+  }
+
+  // ── All events combined ────────────────────────────────────────────────────
+  function allEvents() {
+    const result = [];
+    for (const cal of calendars) {
+      for (const ev of cal.events) {
+        result.push({ ...ev, calColor: cal.color });
+      }
+    }
+    return result;
+  }
 
   // ── Tabs ───────────────────────────────────────────────────────────────────
   function setTab(tab) {
@@ -346,8 +370,9 @@
   function render() {
     const content = document.getElementById("content");
     let html = "";
+    const events = allEvents();
 
-    if (!icsUrl) {
+    if (calendars.length === 0) {
       html += `<div class="empty-state">
         <div class="icon">📅</div>
         <h2>Kalender noch nicht verbunden</h2>
@@ -369,14 +394,17 @@
         const d = weekDates[i];
         const key = fmtDate(d);
         const today = isToday(d);
-        const dayEvs = icsEvents.filter(e => e.date === key).sort((a,b) => (a.time||"").localeCompare(b.time||""));
+        const dayEvs = events.filter(e => e.date === key).sort((a,b) => (a.time||"").localeCompare(b.time||""));
         html += `<div class="day-col${today ? " today" : ""}">
           <div class="day-header">
             <div class="day-name">${DAYS_SHORT[i]}</div>
             <div class="day-num">${d.getDate()}</div>
           </div>`;
         for (const ev of dayEvs) {
-          html += `<div class="event-chip">${ev.time ? `<span class="event-time">${ev.time}</span>` : ""}${escHtml(ev.title)}</div>`;
+          html += `<div class="event-chip" style="background:${ev.calColor}15;border-left:3px solid ${ev.calColor}">
+            ${ev.time ? `<span class="event-time" style="color:${ev.calColor}">${ev.time}</span>` : ""}
+            ${escHtml(ev.title)}
+          </div>`;
         }
         html += `</div>`;
       }
@@ -385,10 +413,10 @@
 
     if (currentTab === "upcoming") {
       const today = fmtDate(new Date());
-      const upcoming = icsEvents
+      const upcoming = events
         .filter(e => e.date >= today)
         .sort((a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||""))
-        .slice(0, 10);
+        .slice(0, 12);
       html += `<div class="section-title">Bevorstehende Termine</div>`;
       if (upcoming.length === 0) {
         html += `<div class="no-events">Keine bevorstehenden Termine</div>`;
@@ -404,10 +432,10 @@
             : isTomorrow(d) ? `<span class="badge badge-blue">Morgen</span>` : "";
           html += `<div class="upcoming-item${hl ? " highlight" : ""}">
             <div class="upcoming-date">
-              <div class="upcoming-date-label">${dateStr}</div>
+              <div class="upcoming-date-label" style="color:${ev.calColor}">${dateStr}</div>
               ${ev.time ? `<div class="upcoming-time-label">${ev.time}</div>` : ""}
             </div>
-            <div class="upcoming-divider"></div>
+            <div class="upcoming-divider" style="background:${ev.calColor}44"></div>
             <div class="upcoming-title${hl ? " bold" : ""}">${escHtml(ev.title)}</div>
             ${badge}
           </div>`;
@@ -420,1907 +448,80 @@
   }
 
   function escHtml(s) {
-    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   }
-
-  function changeWeek(dir) {
-    weekOffset += dir;
-    render();
-  }
+  function changeWeek(dir) { weekOffset += dir; render(); }
 
   // ── Settings ───────────────────────────────────────────────────────────────
   function openSettings() {
-    document.getElementById("ics-input").value = icsUrl || "";
+    renderCalList();
     document.getElementById("settings-status").innerHTML = "";
+    document.getElementById("new-cal-name").value = "";
+    document.getElementById("new-cal-url").value = "";
     document.getElementById("settings-modal").style.display = "flex";
   }
 
-  function closeSettings(e) {
-    if (e.target === document.getElementById("settings-modal")) {
+  function closeSettingsOverlay(e) {
+    if (e.target === document.getElementById("settings-modal"))
       document.getElementById("settings-modal").style.display = "none";
-    }
   }
 
-  async function saveAndFetch() {
-    const url = document.getElementById("ics-input").value.trim();
-    if (!url) return;
-    icsUrl = url;
-    lsSet("cal_ics", url);
-    document.getElementById("settings-status").innerHTML = `<p class="status-loading">⏳ Wird geladen…</p>`;
-    await fetchIcs(url);
-    if (syncStatus === "ok") {
-      document.getElementById("settings-status").innerHTML = `<p class="status-ok">✓ ${icsEvents.length} Termine geladen</p>`;
-    } else {
-      document.getElementById("settings-status").innerHTML = `<p class="status-error">⚠️ Laden fehlgeschlagen – ist der Kalender öffentlich zugänglich?</p>`;
+  function renderCalList() {
+    const list = document.getElementById("cal-list");
+    if (calendars.length === 0) {
+      list.innerHTML = `<p style="font-size:13px;color:#8A8A9A">Noch keine Kalender hinzugefügt.</p>`;
+      return;
     }
+    list.innerHTML = calendars.map((cal, i) => `
+      <div class="cal-item">
+        <div class="cal-dot" style="background:${cal.color}"></div>
+        <div style="flex:1">
+          <div class="cal-name">${escHtml(cal.name)}</div>
+          <div class="cal-status">${cal.status === "ok" ? "✓ " + cal.events.length + " Termine" : cal.status === "error" ? "⚠️ Fehler" : cal.status === "loading" ? "⏳ Lädt…" : "Nicht geladen"}</div>
+        </div>
+        <button class="btn-danger" onclick="removeCal(${i})">Entfernen</button>
+      </div>
+    `).join("");
+  }
+
+  async function addCalendar() {
+    const name = document.getElementById("new-cal-name").value.trim();
+    const url = document.getElementById("new-cal-url").value.trim();
+    if (!name || !url) {
+      document.getElementById("settings-status").innerHTML = `<p class="status-error">Bitte Name und URL eingeben.</p>`;
+      return;
+    }
+    const color = CAL_COLORS[calendars.length % CAL_COLORS.length];
+    const cal = { id: "cal_" + Date.now(), name, url, color, events: [], status: "", lastSync: null };
+    calendars.push(cal);
+    saveCals();
+    document.getElementById("settings-status").innerHTML = `<p class="status-loading">⏳ Wird geladen…</p>`;
+    renderCalList();
+    await fetchCal(cal);
+    if (cal.status === "ok") {
+      document.getElementById("settings-status").innerHTML = `<p class="status-ok">✓ ${cal.events.length} Termine geladen</p>`;
+    } else {
+      document.getElementById("settings-status").innerHTML = `<p class="status-error">⚠️ Laden fehlgeschlagen – ist der Kalender öffentlich?</p>`;
+    }
+    renderCalList();
+    render();
+  }
+
+  function removeCal(i) {
+    calendars.splice(i, 1);
+    saveCals();
+    renderCalList();
+    updateSyncRow();
     render();
   }
 
   // ── Init ───────────────────────────────────────────────────────────────────
-  const savedUrl = lsGet("cal_ics");
-  if (savedUrl) { icsUrl = savedUrl; fetchIcs(savedUrl); }
+  loadCals();
+  updateSyncRow();
   render();
+  if (calendars.length > 0) fetchAllCals();
 </script>
 </body>
 </html>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Familienboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { -webkit-text-size-adjust: 100%; }
-    body {
-      background: #F7F4EF;
-      font-family: 'DM Sans', sans-serif;
-      overscroll-behavior: none;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      min-height: 100dvh;
-    }
-    button { touch-action: manipulation; font-family: 'DM Sans', sans-serif; cursor: pointer; }
-    input { font-family: 'DM Sans', sans-serif; user-select: text; -webkit-user-select: text; }
-    @keyframes blink { 50% { opacity: 0.2; } }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: #E8E4DC; border-radius: 4px; }
 
-    /* Layout */
-    #app { display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; min-height: 100dvh; padding-bottom: 68px; }
-
-    /* Header */
-    #header {
-      padding: 16px 24px 12px;
-      border-bottom: 1px solid #E8E4DC;
-      background: #F7F4EF;
-      position: sticky; top: 0; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .logo { font-family: 'Playfair Display', serif; font-size: 28px; color: #1A1A2E; font-weight: 700; }
-    .logo span { color: #2D6A4F; }
-    .sync-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
-    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #8A8A9A; }
-    .sync-dot.ok { background: #2D6A4F; }
-    .sync-dot.error { background: #E07A5F; }
-    .sync-label { font-size: 12px; color: #8A8A9A; }
-    .refresh-btn { background: none; border: none; color: #8A8A9A; font-size: 16px; padding: 0 4px; }
-
-    /* Clock */
-    #clock { text-align: right; }
-    #clock-time { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: #1A1A2E; line-height: 1; }
-    #clock-time .colon { animation: blink 1s step-end infinite; }
-    #clock-date { font-size: 13px; color: #8A8A9A; margin-top: 2px; }
-    .settings-btn {
-      background: none; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      width: 44px; height: 44px; font-size: 20px;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* Content */
-    #content { flex: 1; padding: 20px 24px; overflow-y: auto; }
-
-    /* Empty state */
-    .empty-state {
-      background: #fff; border: 1.5px solid #E8E4DC; border-radius: 16px;
-      padding: 32px; text-align: center; margin-bottom: 20px;
-    }
-    .empty-state .icon { font-size: 36px; margin-bottom: 10px; }
-    .empty-state h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; margin-bottom: 8px; }
-    .empty-state p { font-size: 14px; color: #8A8A9A; margin-bottom: 16px; }
-    .btn-primary {
-      background: #2D6A4F; color: #fff; border: none;
-      border-radius: 12px; padding: 12px 24px; font-size: 15px; font-weight: 700;
-    }
-
-    /* Week nav */
-    .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .week-nav button { background: none; border: none; font-size: 26px; color: #8A8A9A; padding: 4px 14px; border-radius: 8px; }
-    .week-nav span { font-family: 'Playfair Display', serif; font-size: 18px; color: #8A8A9A; }
-
-    /* Day grid */
-    .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-    .day-col {
-      background: #fff; border: 2px solid #E8E4DC; border-radius: 16px;
-      padding: 10px 6px; display: flex; flex-direction: column; gap: 5px;
-      min-height: 160px; overflow: hidden;
-    }
-    .day-col.today { background: #2D6A4F10; border-color: #2D6A4F; }
-    .day-header { text-align: center; margin-bottom: 4px; }
-    .day-name { font-size: 11px; color: #8A8A9A; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-    .day-num {
-      font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
-      color: #1A1A2E; width: 38px; margin: 3px auto 0; line-height: 38px;
-      border-radius: 10px; text-align: center;
-    }
-    .day-col.today .day-num { background: #2D6A4F; color: #fff; }
-    .day-col.today .day-name { color: #2D6A4F; }
-    .event-chip {
-      background: #1A73E815; border-left: 3px solid #1A73E8;
-      border-radius: 7px; padding: 4px 5px; font-size: 11px;
-      color: #1A1A2E; word-break: break-word; line-height: 1.4;
-    }
-    .event-time { color: #1A73E8; font-weight: 700; font-size: 10px; display: block; }
-
-    /* Upcoming list */
-    .upcoming-list { display: flex; flex-direction: column; gap: 8px; }
-    .upcoming-item {
-      display: flex; align-items: center; gap: 12;
-      background: #fff; border: 1.5px solid #E8E4DC;
-      border-radius: 12px; padding: 12px 14px;
-    }
-    .upcoming-item.highlight { background: #1A73E810; border-color: #1A73E844; }
-    .upcoming-date { min-width: 68px; text-align: center; }
-    .upcoming-date-label { font-size: 12px; font-weight: 700; color: #1A73E8; }
-    .upcoming-time-label { font-size: 11px; color: #8A8A9A; }
-    .upcoming-divider { width: 2px; height: 32px; background: #1A73E844; border-radius: 2px; flex-shrink: 0; }
-    .upcoming-title { flex: 1; font-size: 15px; color: #1A1A2E; }
-    .upcoming-title.bold { font-weight: 600; }
-    .badge {
-      font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px;
-    }
-    .badge-green { color: #2D6A4F; background: #2D6A4F18; }
-    .badge-blue { color: #1A73E8; background: #1A73E818; }
-
-    /* Tab bar */
-    #tabbar {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 1200px;
-      background: rgba(247,244,239,0.97);
-      border-top: 1px solid #E8E4DC;
-      display: flex; padding: 8px 16px 12px; gap: 8px; z-index: 20;
-    }
-    .tab-btn {
-      flex: 1; min-height: 48px; border: none; border-radius: 14px;
-      font-size: 14px; font-weight: 700; color: #8A8A9A; background: transparent;
-    }
-    .tab-btn.active { background: #2D6A4F; color: #fff; }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center; z-index: 100;
-    }
-    .modal {
-      background: #fff; border-radius: 20px; padding: 28px;
-      width: min(560px, 90vw); display: flex; flex-direction: column; gap: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    }
-    .modal h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: #1A1A2E; }
-    .modal label { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
-    .modal input {
-      width: 100%; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      padding: 12px 14px; font-size: 14px; background: #FAFAF8; color: #1A1A2E; outline: none;
-    }
-    .modal input:focus { outline: 2px solid #2D6A4F44; }
-    .modal-hint { font-size: 12px; color: #8A8A9A; margin-top: 4px; line-height: 1.6; }
-    .modal-actions { display: flex; gap: 10px; }
-    .modal-actions .btn-primary { flex: 1; }
-    .btn-ghost {
-      background: #F7F4EF; color: #1A1A2E; border: 1.5px solid #E8E4DC;
-      border-radius: 12px; padding: 12px 20px; font-size: 15px;
-    }
-    .status-ok { font-size: 13px; color: #2D6A4F; }
-    .status-error { font-size: 13px; color: #E07A5F; }
-    .status-loading { font-size: 13px; color: #8A8A9A; }
-    .info-box { background: #F7F4EF; border: 1px solid #E8E4DC; border-radius: 12px; padding: 14px; }
-    .info-box h3 { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .info-box p { font-size: 13px; color: #8A8A9A; line-height: 1.6; }
-    .section-title { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; margin-bottom: 12px; }
-    .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 15px; }
-  </style>
-</head>
-<body>
-<div id="app">
-  <div id="header">
-    <div>
-      <div class="logo">Familien<span>board</span></div>
-      <div class="sync-row">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span class="sync-label" id="sync-label">Kein Kalender</span>
-        <button class="refresh-btn" onclick="manualRefresh()">↻</button>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:14px">
-      <div id="clock">
-        <div id="clock-time"><span id="ch">00</span><span class="colon">:</span><span id="cm">00</span></div>
-        <div id="clock-date"></div>
-      </div>
-      <button class="settings-btn" onclick="openSettings()">⚙️</button>
-    </div>
-  </div>
-
-  <div id="content"></div>
-
-  <div id="tabbar">
-    <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Woche</button>
-    <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
-  </div>
-</div>
-
-<!-- Settings Modal -->
-<div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettings(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h2>Einstellungen</h2>
-    <div>
-      <label>Kalender .ics-Link</label>
-      <input type="url" id="ics-input" placeholder="https://calendar.google.com/calendar/ical/…" />
-      <p class="modal-hint">Google Kalender → ⋮ → Einstellungen und Freigabe → „Öffentliche URL im iCal-Format"</p>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-primary" onclick="saveAndFetch()">Speichern & laden</button>
-      <button class="btn-ghost" onclick="document.getElementById('settings-modal').style.display='none'">Schließen</button>
-    </div>
-    <div id="settings-status"></div>
-    <div class="info-box">
-      <h3>Automatische Aktualisierung</h3>
-      <p>Der Kalender wird alle 5 Minuten automatisch aktualisiert. Neue Termine erscheinen ohne manuelle Aktion.</p>
-    </div>
-  </div>
-</div>
-
-<script>
-  const DAYS_SHORT = ["Mo","Di","Mi","Do","Fr","Sa","So"];
-  const DAYS_LONG = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
-  const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-  const MONTHS_SHORT = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-
-  let currentTab = "week";
-  let weekOffset = 0;
-  let icsEvents = [];
-  let icsUrl = "";
-  let syncStatus = "";
-  let lastSync = null;
-
-  // ── Storage ────────────────────────────────────────────────────────────────
-  function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
-  function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
-
-  // ── Clock ──────────────────────────────────────────────────────────────────
-  function updateClock() {
-    const now = new Date();
-    document.getElementById("ch").textContent = String(now.getHours()).padStart(2,"0");
-    document.getElementById("cm").textContent = String(now.getMinutes()).padStart(2,"0");
-    const di = now.getDay() === 0 ? 6 : now.getDay() - 1;
-    document.getElementById("clock-date").textContent = DAYS_LONG[di] + ", " + now.getDate() + ". " + MONTHS[now.getMonth()] + " " + now.getFullYear();
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
-
-  // ── Date helpers ───────────────────────────────────────────────────────────
-  function fmtDate(d) {
-    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-  }
-  function isToday(d) { return fmtDate(d) === fmtDate(new Date()); }
-  function isTomorrow(d) { const t = new Date(); t.setDate(t.getDate()+1); return fmtDate(d) === fmtDate(t); }
-  function getWeekDates(offset) {
-    const now = new Date();
-    const day = now.getDay();
-    const diff = (day === 0 ? -6 : 1 - day) + offset * 7;
-    return Array.from({length:7}, (_,i) => { const d = new Date(now); d.setDate(now.getDate()+diff+i); return d; });
-  }
-
-  // ── iCal parser ────────────────────────────────────────────────────────────
-  function parseIcs(text) {
-    const events = [];
-    const lines = text.split("\n");
-    const unfolded = [];
-    for (const line of lines) {
-      const trimmed = line.replace(/\r$/, "");
-      if ((trimmed.startsWith(" ") || trimmed.startsWith("\t")) && unfolded.length > 0) {
-        unfolded[unfolded.length-1] += trimmed.slice(1);
-      } else { unfolded.push(trimmed); }
-    }
-    let cur = null;
-    for (const line of unfolded) {
-      if (line === "BEGIN:VEVENT") { cur = {}; continue; }
-      if (line === "END:VEVENT" && cur) { if (cur.date && cur.title) events.push(cur); cur = null; continue; }
-      if (!cur) continue;
-      const colon = line.indexOf(":");
-      if (colon === -1) continue;
-      const key = line.slice(0, colon);
-      const val = line.slice(colon+1).trim();
-      if (key === "SUMMARY" || key.startsWith("SUMMARY;")) cur.title = val;
-      if (key === "DTSTART" || key.startsWith("DTSTART;")) {
-        const y=val.slice(0,4), m=val.slice(4,6), d=val.slice(6,8);
-        const hasTime = val.indexOf("T") !== -1;
-        cur.date = y+"-"+m+"-"+d;
-        cur.time = hasTime ? val.slice(9,11)+":"+val.slice(11,13) : "";
-        cur.id = "e_"+Math.random().toString(36).slice(2);
-      }
-    }
-    return events;
-  }
-
-  // ── Fetch ics ──────────────────────────────────────────────────────────────
-  async function fetchIcs(url) {
-    if (!url) return;
-    setSyncStatus("loading");
-    try {
-      const httpUrl = url.replace(/^webcal:\/\//i, "https://");
-      // Use our own Vercel proxy endpoint
-      const res = await fetch("/api/ics?url=" + encodeURIComponent(httpUrl));
-      if (!res.ok) throw new Error("Status " + res.status);
-      const text = await res.text();
-      icsEvents = parseIcs(text);
-      lastSync = new Date();
-      setSyncStatus("ok");
-      render();
-    } catch(e) {
-      setSyncStatus("error");
-    }
-  }
-
-  function setSyncStatus(status) {
-    syncStatus = status;
-    const dot = document.getElementById("sync-dot");
-    const label = document.getElementById("sync-label");
-    dot.className = "sync-dot " + (status === "ok" ? "ok" : status === "error" ? "error" : "");
-    if (status === "ok" && lastSync) {
-      label.textContent = "Sync " + String(lastSync.getHours()).padStart(2,"0") + ":" + String(lastSync.getMinutes()).padStart(2,"0");
-    } else if (status === "loading") {
-      label.textContent = "Lädt…";
-    } else if (status === "error") {
-      label.textContent = "Sync fehlgeschlagen";
-    } else {
-      label.textContent = "Kein Kalender";
-    }
-  }
-
-  function manualRefresh() { if (icsUrl) fetchIcs(icsUrl); }
-
-  // Auto-refresh every 5 minutes
-  setInterval(() => { if (icsUrl) fetchIcs(icsUrl); }, 5 * 60 * 1000);
-
-  // ── Tabs ───────────────────────────────────────────────────────────────────
-  function setTab(tab) {
-    currentTab = tab;
-    document.getElementById("tab-week").className = "tab-btn" + (tab === "week" ? " active" : "");
-    document.getElementById("tab-upcoming").className = "tab-btn" + (tab === "upcoming" ? " active" : "");
-    if (tab === "week") weekOffset = 0;
-    render();
-  }
-
-  // ── Render ─────────────────────────────────────────────────────────────────
-  function render() {
-    const content = document.getElementById("content");
-    let html = "";
-
-    if (!icsUrl) {
-      html += `<div class="empty-state">
-        <div class="icon">📅</div>
-        <h2>Kalender noch nicht verbunden</h2>
-        <p>Tippe auf ⚙️ und füge den .ics-Link deines Google Kalenders ein.</p>
-        <button class="btn-primary" onclick="openSettings()">Kalender verbinden</button>
-      </div>`;
-    }
-
-    if (currentTab === "week") {
-      const weekDates = getWeekDates(weekOffset);
-      const weekLabel = weekOffset === 0 ? "Diese Woche" : weekOffset === 1 ? "Nächste Woche" : weekOffset === -1 ? "Letzte Woche" : (weekOffset > 0 ? "+" : "") + weekOffset + " Wochen";
-      html += `<div class="week-nav">
-        <button onclick="changeWeek(-1)">‹</button>
-        <span>${weekLabel}</span>
-        <button onclick="changeWeek(1)">›</button>
-      </div>
-      <div class="day-grid">`;
-      for (let i = 0; i < 7; i++) {
-        const d = weekDates[i];
-        const key = fmtDate(d);
-        const today = isToday(d);
-        const dayEvs = icsEvents.filter(e => e.date === key).sort((a,b) => (a.time||"").localeCompare(b.time||""));
-        html += `<div class="day-col${today ? " today" : ""}">
-          <div class="day-header">
-            <div class="day-name">${DAYS_SHORT[i]}</div>
-            <div class="day-num">${d.getDate()}</div>
-          </div>`;
-        for (const ev of dayEvs) {
-          html += `<div class="event-chip">${ev.time ? `<span class="event-time">${ev.time}</span>` : ""}${escHtml(ev.title)}</div>`;
-        }
-        html += `</div>`;
-      }
-      html += `</div>`;
-    }
-
-    if (currentTab === "upcoming") {
-      const today = fmtDate(new Date());
-      const upcoming = icsEvents
-        .filter(e => e.date >= today)
-        .sort((a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||""))
-        .slice(0, 10);
-      html += `<div class="section-title">Bevorstehende Termine</div>`;
-      if (upcoming.length === 0) {
-        html += `<div class="no-events">Keine bevorstehenden Termine</div>`;
-      } else {
-        html += `<div class="upcoming-list">`;
-        for (const ev of upcoming) {
-          const d = new Date(ev.date + "T12:00:00");
-          const di = d.getDay() === 0 ? 6 : d.getDay() - 1;
-          const dateStr = DAYS_SHORT[di] + " " + d.getDate() + ". " + MONTHS_SHORT[d.getMonth()];
-          const hl = ev.date === today || isTomorrow(d);
-          const badge = ev.date === today
-            ? `<span class="badge badge-green">Heute</span>`
-            : isTomorrow(d) ? `<span class="badge badge-blue">Morgen</span>` : "";
-          html += `<div class="upcoming-item${hl ? " highlight" : ""}">
-            <div class="upcoming-date">
-              <div class="upcoming-date-label">${dateStr}</div>
-              ${ev.time ? `<div class="upcoming-time-label">${ev.time}</div>` : ""}
-            </div>
-            <div class="upcoming-divider"></div>
-            <div class="upcoming-title${hl ? " bold" : ""}">${escHtml(ev.title)}</div>
-            ${badge}
-          </div>`;
-        }
-        html += `</div>`;
-      }
-    }
-
-    content.innerHTML = html;
-  }
-
-  function escHtml(s) {
-    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }
-
-  function changeWeek(dir) {
-    weekOffset += dir;
-    render();
-  }
-
-  // ── Settings ───────────────────────────────────────────────────────────────
-  function openSettings() {
-    document.getElementById("ics-input").value = icsUrl || "";
-    document.getElementById("settings-status").innerHTML = "";
-    document.getElementById("settings-modal").style.display = "flex";
-  }
-
-  function closeSettings(e) {
-    if (e.target === document.getElementById("settings-modal")) {
-      document.getElementById("settings-modal").style.display = "none";
-    }
-  }
-
-  async function saveAndFetch() {
-    const url = document.getElementById("ics-input").value.trim();
-    if (!url) return;
-    icsUrl = url;
-    lsSet("cal_ics", url);
-    document.getElementById("settings-status").innerHTML = `<p class="status-loading">⏳ Wird geladen…</p>`;
-    await fetchIcs(url);
-    if (syncStatus === "ok") {
-      document.getElementById("settings-status").innerHTML = `<p class="status-ok">✓ ${icsEvents.length} Termine geladen</p>`;
-    } else {
-      document.getElementById("settings-status").innerHTML = `<p class="status-error">⚠️ Laden fehlgeschlagen – ist der Kalender öffentlich zugänglich?</p>`;
-    }
-    render();
-  }
-
-  // ── Init ───────────────────────────────────────────────────────────────────
-  const savedUrl = lsGet("cal_ics");
-  if (savedUrl) { icsUrl = savedUrl; fetchIcs(savedUrl); }
-  render();
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Familienboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { -webkit-text-size-adjust: 100%; }
-    body {
-      background: #F7F4EF;
-      font-family: 'DM Sans', sans-serif;
-      overscroll-behavior: none;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      min-height: 100dvh;
-    }
-    button { touch-action: manipulation; font-family: 'DM Sans', sans-serif; cursor: pointer; }
-    input { font-family: 'DM Sans', sans-serif; user-select: text; -webkit-user-select: text; }
-    @keyframes blink { 50% { opacity: 0.2; } }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: #E8E4DC; border-radius: 4px; }
-
-    /* Layout */
-    #app { display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; min-height: 100dvh; padding-bottom: 68px; }
-
-    /* Header */
-    #header {
-      padding: 16px 24px 12px;
-      border-bottom: 1px solid #E8E4DC;
-      background: #F7F4EF;
-      position: sticky; top: 0; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .logo { font-family: 'Playfair Display', serif; font-size: 28px; color: #1A1A2E; font-weight: 700; }
-    .logo span { color: #2D6A4F; }
-    .sync-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
-    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #8A8A9A; }
-    .sync-dot.ok { background: #2D6A4F; }
-    .sync-dot.error { background: #E07A5F; }
-    .sync-label { font-size: 12px; color: #8A8A9A; }
-    .refresh-btn { background: none; border: none; color: #8A8A9A; font-size: 16px; padding: 0 4px; }
-
-    /* Clock */
-    #clock { text-align: right; }
-    #clock-time { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: #1A1A2E; line-height: 1; }
-    #clock-time .colon { animation: blink 1s step-end infinite; }
-    #clock-date { font-size: 13px; color: #8A8A9A; margin-top: 2px; }
-    .settings-btn {
-      background: none; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      width: 44px; height: 44px; font-size: 20px;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* Content */
-    #content { flex: 1; padding: 20px 24px; overflow-y: auto; }
-
-    /* Empty state */
-    .empty-state {
-      background: #fff; border: 1.5px solid #E8E4DC; border-radius: 16px;
-      padding: 32px; text-align: center; margin-bottom: 20px;
-    }
-    .empty-state .icon { font-size: 36px; margin-bottom: 10px; }
-    .empty-state h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; margin-bottom: 8px; }
-    .empty-state p { font-size: 14px; color: #8A8A9A; margin-bottom: 16px; }
-    .btn-primary {
-      background: #2D6A4F; color: #fff; border: none;
-      border-radius: 12px; padding: 12px 24px; font-size: 15px; font-weight: 700;
-    }
-
-    /* Week nav */
-    .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .week-nav button { background: none; border: none; font-size: 26px; color: #8A8A9A; padding: 4px 14px; border-radius: 8px; }
-    .week-nav span { font-family: 'Playfair Display', serif; font-size: 18px; color: #8A8A9A; }
-
-    /* Day grid */
-    .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-    .day-col {
-      background: #fff; border: 2px solid #E8E4DC; border-radius: 16px;
-      padding: 10px 6px; display: flex; flex-direction: column; gap: 5px;
-      min-height: 160px; overflow: hidden;
-    }
-    .day-col.today { background: #2D6A4F10; border-color: #2D6A4F; }
-    .day-header { text-align: center; margin-bottom: 4px; }
-    .day-name { font-size: 11px; color: #8A8A9A; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-    .day-num {
-      font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
-      color: #1A1A2E; width: 38px; margin: 3px auto 0; line-height: 38px;
-      border-radius: 10px; text-align: center;
-    }
-    .day-col.today .day-num { background: #2D6A4F; color: #fff; }
-    .day-col.today .day-name { color: #2D6A4F; }
-    .event-chip {
-      background: #1A73E815; border-left: 3px solid #1A73E8;
-      border-radius: 7px; padding: 4px 5px; font-size: 11px;
-      color: #1A1A2E; word-break: break-word; line-height: 1.4;
-    }
-    .event-time { color: #1A73E8; font-weight: 700; font-size: 10px; display: block; }
-
-    /* Upcoming list */
-    .upcoming-list { display: flex; flex-direction: column; gap: 8px; }
-    .upcoming-item {
-      display: flex; align-items: center; gap: 12;
-      background: #fff; border: 1.5px solid #E8E4DC;
-      border-radius: 12px; padding: 12px 14px;
-    }
-    .upcoming-item.highlight { background: #1A73E810; border-color: #1A73E844; }
-    .upcoming-date { min-width: 68px; text-align: center; }
-    .upcoming-date-label { font-size: 12px; font-weight: 700; color: #1A73E8; }
-    .upcoming-time-label { font-size: 11px; color: #8A8A9A; }
-    .upcoming-divider { width: 2px; height: 32px; background: #1A73E844; border-radius: 2px; flex-shrink: 0; }
-    .upcoming-title { flex: 1; font-size: 15px; color: #1A1A2E; }
-    .upcoming-title.bold { font-weight: 600; }
-    .badge {
-      font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px;
-    }
-    .badge-green { color: #2D6A4F; background: #2D6A4F18; }
-    .badge-blue { color: #1A73E8; background: #1A73E818; }
-
-    /* Tab bar */
-    #tabbar {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 1200px;
-      background: rgba(247,244,239,0.97);
-      border-top: 1px solid #E8E4DC;
-      display: flex; padding: 8px 16px 12px; gap: 8px; z-index: 20;
-    }
-    .tab-btn {
-      flex: 1; min-height: 48px; border: none; border-radius: 14px;
-      font-size: 14px; font-weight: 700; color: #8A8A9A; background: transparent;
-    }
-    .tab-btn.active { background: #2D6A4F; color: #fff; }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center; z-index: 100;
-    }
-    .modal {
-      background: #fff; border-radius: 20px; padding: 28px;
-      width: min(560px, 90vw); display: flex; flex-direction: column; gap: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    }
-    .modal h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: #1A1A2E; }
-    .modal label { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
-    .modal input {
-      width: 100%; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      padding: 12px 14px; font-size: 14px; background: #FAFAF8; color: #1A1A2E; outline: none;
-    }
-    .modal input:focus { outline: 2px solid #2D6A4F44; }
-    .modal-hint { font-size: 12px; color: #8A8A9A; margin-top: 4px; line-height: 1.6; }
-    .modal-actions { display: flex; gap: 10px; }
-    .modal-actions .btn-primary { flex: 1; }
-    .btn-ghost {
-      background: #F7F4EF; color: #1A1A2E; border: 1.5px solid #E8E4DC;
-      border-radius: 12px; padding: 12px 20px; font-size: 15px;
-    }
-    .status-ok { font-size: 13px; color: #2D6A4F; }
-    .status-error { font-size: 13px; color: #E07A5F; }
-    .status-loading { font-size: 13px; color: #8A8A9A; }
-    .info-box { background: #F7F4EF; border: 1px solid #E8E4DC; border-radius: 12px; padding: 14px; }
-    .info-box h3 { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .info-box p { font-size: 13px; color: #8A8A9A; line-height: 1.6; }
-    .section-title { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; margin-bottom: 12px; }
-    .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 15px; }
-  </style>
-</head>
-<body>
-<div id="app">
-  <div id="header">
-    <div>
-      <div class="logo">Familien<span>board</span></div>
-      <div class="sync-row">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span class="sync-label" id="sync-label">Kein Kalender</span>
-        <button class="refresh-btn" onclick="manualRefresh()">↻</button>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:14px">
-      <div id="clock">
-        <div id="clock-time"><span id="ch">00</span><span class="colon">:</span><span id="cm">00</span></div>
-        <div id="clock-date"></div>
-      </div>
-      <button class="settings-btn" onclick="openSettings()">⚙️</button>
-    </div>
-  </div>
-
-  <div id="content"></div>
-
-  <div id="tabbar">
-    <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Woche</button>
-    <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
-  </div>
-</div>
-
-<!-- Settings Modal -->
-<div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettings(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h2>Einstellungen</h2>
-    <div>
-      <label>Kalender .ics-Link</label>
-      <input type="url" id="ics-input" placeholder="https://calendar.google.com/calendar/ical/…" />
-      <p class="modal-hint">Google Kalender → ⋮ → Einstellungen und Freigabe → „Öffentliche URL im iCal-Format"</p>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-primary" onclick="saveAndFetch()">Speichern & laden</button>
-      <button class="btn-ghost" onclick="document.getElementById('settings-modal').style.display='none'">Schließen</button>
-    </div>
-    <div id="settings-status"></div>
-    <div class="info-box">
-      <h3>Automatische Aktualisierung</h3>
-      <p>Der Kalender wird alle 5 Minuten automatisch aktualisiert. Neue Termine erscheinen ohne manuelle Aktion.</p>
-    </div>
-  </div>
-</div>
-
-<script>
-  const DAYS_SHORT = ["Mo","Di","Mi","Do","Fr","Sa","So"];
-  const DAYS_LONG = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
-  const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-  const MONTHS_SHORT = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-
-  let currentTab = "week";
-  let weekOffset = 0;
-  let icsEvents = [];
-  let icsUrl = "";
-  let syncStatus = "";
-  let lastSync = null;
-
-  // ── Storage ────────────────────────────────────────────────────────────────
-  function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
-  function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
-
-  // ── Clock ──────────────────────────────────────────────────────────────────
-  function updateClock() {
-    const now = new Date();
-    document.getElementById("ch").textContent = String(now.getHours()).padStart(2,"0");
-    document.getElementById("cm").textContent = String(now.getMinutes()).padStart(2,"0");
-    const di = now.getDay() === 0 ? 6 : now.getDay() - 1;
-    document.getElementById("clock-date").textContent = DAYS_LONG[di] + ", " + now.getDate() + ". " + MONTHS[now.getMonth()] + " " + now.getFullYear();
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
-
-  // ── Date helpers ───────────────────────────────────────────────────────────
-  function fmtDate(d) {
-    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-  }
-  function isToday(d) { return fmtDate(d) === fmtDate(new Date()); }
-  function isTomorrow(d) { const t = new Date(); t.setDate(t.getDate()+1); return fmtDate(d) === fmtDate(t); }
-  function getWeekDates(offset) {
-    const now = new Date();
-    const day = now.getDay();
-    const diff = (day === 0 ? -6 : 1 - day) + offset * 7;
-    return Array.from({length:7}, (_,i) => { const d = new Date(now); d.setDate(now.getDate()+diff+i); return d; });
-  }
-
-  // ── iCal parser ────────────────────────────────────────────────────────────
-  function parseIcs(text) {
-    const events = [];
-    const lines = text.split("\n");
-    const unfolded = [];
-    for (const line of lines) {
-      const trimmed = line.replace(/\r$/, "");
-      if ((trimmed.startsWith(" ") || trimmed.startsWith("\t")) && unfolded.length > 0) {
-        unfolded[unfolded.length-1] += trimmed.slice(1);
-      } else { unfolded.push(trimmed); }
-    }
-    let cur = null;
-    for (const line of unfolded) {
-      if (line === "BEGIN:VEVENT") { cur = {}; continue; }
-      if (line === "END:VEVENT" && cur) { if (cur.date && cur.title) events.push(cur); cur = null; continue; }
-      if (!cur) continue;
-      const colon = line.indexOf(":");
-      if (colon === -1) continue;
-      const key = line.slice(0, colon);
-      const val = line.slice(colon+1).trim();
-      if (key === "SUMMARY" || key.startsWith("SUMMARY;")) cur.title = val;
-      if (key === "DTSTART" || key.startsWith("DTSTART;")) {
-        const y=val.slice(0,4), m=val.slice(4,6), d=val.slice(6,8);
-        const hasTime = val.indexOf("T") !== -1;
-        cur.date = y+"-"+m+"-"+d;
-        cur.time = hasTime ? val.slice(9,11)+":"+val.slice(11,13) : "";
-        cur.id = "e_"+Math.random().toString(36).slice(2);
-      }
-    }
-    return events;
-  }
-
-  // ── Fetch ics ──────────────────────────────────────────────────────────────
-  async function fetchIcs(url) {
-    if (!url) return;
-    setSyncStatus("loading");
-    try {
-      const httpUrl = url.replace(/^webcal:\/\//i, "https://");
-      // Use our own Vercel proxy endpoint
-      const res = await fetch("/api/ics?url=" + encodeURIComponent(httpUrl));
-      if (!res.ok) throw new Error("Status " + res.status);
-      const text = await res.text();
-      icsEvents = parseIcs(text);
-      lastSync = new Date();
-      setSyncStatus("ok");
-      render();
-    } catch(e) {
-      setSyncStatus("error");
-    }
-  }
-
-  function setSyncStatus(status) {
-    syncStatus = status;
-    const dot = document.getElementById("sync-dot");
-    const label = document.getElementById("sync-label");
-    dot.className = "sync-dot " + (status === "ok" ? "ok" : status === "error" ? "error" : "");
-    if (status === "ok" && lastSync) {
-      label.textContent = "Sync " + String(lastSync.getHours()).padStart(2,"0") + ":" + String(lastSync.getMinutes()).padStart(2,"0");
-    } else if (status === "loading") {
-      label.textContent = "Lädt…";
-    } else if (status === "error") {
-      label.textContent = "Sync fehlgeschlagen";
-    } else {
-      label.textContent = "Kein Kalender";
-    }
-  }
-
-  function manualRefresh() { if (icsUrl) fetchIcs(icsUrl); }
-
-  // Auto-refresh every 5 minutes
-  setInterval(() => { if (icsUrl) fetchIcs(icsUrl); }, 5 * 60 * 1000);
-
-  // ── Tabs ───────────────────────────────────────────────────────────────────
-  function setTab(tab) {
-    currentTab = tab;
-    document.getElementById("tab-week").className = "tab-btn" + (tab === "week" ? " active" : "");
-    document.getElementById("tab-upcoming").className = "tab-btn" + (tab === "upcoming" ? " active" : "");
-    if (tab === "week") weekOffset = 0;
-    render();
-  }
-
-  // ── Render ─────────────────────────────────────────────────────────────────
-  function render() {
-    const content = document.getElementById("content");
-    let html = "";
-
-    if (!icsUrl) {
-      html += `<div class="empty-state">
-        <div class="icon">📅</div>
-        <h2>Kalender noch nicht verbunden</h2>
-        <p>Tippe auf ⚙️ und füge den .ics-Link deines Google Kalenders ein.</p>
-        <button class="btn-primary" onclick="openSettings()">Kalender verbinden</button>
-      </div>`;
-    }
-
-    if (currentTab === "week") {
-      const weekDates = getWeekDates(weekOffset);
-      const weekLabel = weekOffset === 0 ? "Diese Woche" : weekOffset === 1 ? "Nächste Woche" : weekOffset === -1 ? "Letzte Woche" : (weekOffset > 0 ? "+" : "") + weekOffset + " Wochen";
-      html += `<div class="week-nav">
-        <button onclick="changeWeek(-1)">‹</button>
-        <span>${weekLabel}</span>
-        <button onclick="changeWeek(1)">›</button>
-      </div>
-      <div class="day-grid">`;
-      for (let i = 0; i < 7; i++) {
-        const d = weekDates[i];
-        const key = fmtDate(d);
-        const today = isToday(d);
-        const dayEvs = icsEvents.filter(e => e.date === key).sort((a,b) => (a.time||"").localeCompare(b.time||""));
-        html += `<div class="day-col${today ? " today" : ""}">
-          <div class="day-header">
-            <div class="day-name">${DAYS_SHORT[i]}</div>
-            <div class="day-num">${d.getDate()}</div>
-          </div>`;
-        for (const ev of dayEvs) {
-          html += `<div class="event-chip">${ev.time ? `<span class="event-time">${ev.time}</span>` : ""}${escHtml(ev.title)}</div>`;
-        }
-        html += `</div>`;
-      }
-      html += `</div>`;
-    }
-
-    if (currentTab === "upcoming") {
-      const today = fmtDate(new Date());
-      const upcoming = icsEvents
-        .filter(e => e.date >= today)
-        .sort((a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||""))
-        .slice(0, 10);
-      html += `<div class="section-title">Bevorstehende Termine</div>`;
-      if (upcoming.length === 0) {
-        html += `<div class="no-events">Keine bevorstehenden Termine</div>`;
-      } else {
-        html += `<div class="upcoming-list">`;
-        for (const ev of upcoming) {
-          const d = new Date(ev.date + "T12:00:00");
-          const di = d.getDay() === 0 ? 6 : d.getDay() - 1;
-          const dateStr = DAYS_SHORT[di] + " " + d.getDate() + ". " + MONTHS_SHORT[d.getMonth()];
-          const hl = ev.date === today || isTomorrow(d);
-          const badge = ev.date === today
-            ? `<span class="badge badge-green">Heute</span>`
-            : isTomorrow(d) ? `<span class="badge badge-blue">Morgen</span>` : "";
-          html += `<div class="upcoming-item${hl ? " highlight" : ""}">
-            <div class="upcoming-date">
-              <div class="upcoming-date-label">${dateStr}</div>
-              ${ev.time ? `<div class="upcoming-time-label">${ev.time}</div>` : ""}
-            </div>
-            <div class="upcoming-divider"></div>
-            <div class="upcoming-title${hl ? " bold" : ""}">${escHtml(ev.title)}</div>
-            ${badge}
-          </div>`;
-        }
-        html += `</div>`;
-      }
-    }
-
-    content.innerHTML = html;
-  }
-
-  function escHtml(s) {
-    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }
-
-  function changeWeek(dir) {
-    weekOffset += dir;
-    render();
-  }
-
-  // ── Settings ───────────────────────────────────────────────────────────────
-  function openSettings() {
-    document.getElementById("ics-input").value = icsUrl || "";
-    document.getElementById("settings-status").innerHTML = "";
-    document.getElementById("settings-modal").style.display = "flex";
-  }
-
-  function closeSettings(e) {
-    if (e.target === document.getElementById("settings-modal")) {
-      document.getElementById("settings-modal").style.display = "none";
-    }
-  }
-
-  async function saveAndFetch() {
-    const url = document.getElementById("ics-input").value.trim();
-    if (!url) return;
-    icsUrl = url;
-    lsSet("cal_ics", url);
-    document.getElementById("settings-status").innerHTML = `<p class="status-loading">⏳ Wird geladen…</p>`;
-    await fetchIcs(url);
-    if (syncStatus === "ok") {
-      document.getElementById("settings-status").innerHTML = `<p class="status-ok">✓ ${icsEvents.length} Termine geladen</p>`;
-    } else {
-      document.getElementById("settings-status").innerHTML = `<p class="status-error">⚠️ Laden fehlgeschlagen – ist der Kalender öffentlich zugänglich?</p>`;
-    }
-    render();
-  }
-
-  // ── Init ───────────────────────────────────────────────────────────────────
-  const savedUrl = lsGet("cal_ics");
-  if (savedUrl) { icsUrl = savedUrl; fetchIcs(savedUrl); }
-  render();
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Familienboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { -webkit-text-size-adjust: 100%; }
-    body {
-      background: #F7F4EF;
-      font-family: 'DM Sans', sans-serif;
-      overscroll-behavior: none;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      min-height: 100dvh;
-    }
-    button { touch-action: manipulation; font-family: 'DM Sans', sans-serif; cursor: pointer; }
-    input { font-family: 'DM Sans', sans-serif; user-select: text; -webkit-user-select: text; }
-    @keyframes blink { 50% { opacity: 0.2; } }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: #E8E4DC; border-radius: 4px; }
-
-    /* Layout */
-    #app { display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; min-height: 100dvh; padding-bottom: 68px; }
-
-    /* Header */
-    #header {
-      padding: 16px 24px 12px;
-      border-bottom: 1px solid #E8E4DC;
-      background: #F7F4EF;
-      position: sticky; top: 0; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .logo { font-family: 'Playfair Display', serif; font-size: 28px; color: #1A1A2E; font-weight: 700; }
-    .logo span { color: #2D6A4F; }
-    .sync-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
-    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #8A8A9A; }
-    .sync-dot.ok { background: #2D6A4F; }
-    .sync-dot.error { background: #E07A5F; }
-    .sync-label { font-size: 12px; color: #8A8A9A; }
-    .refresh-btn { background: none; border: none; color: #8A8A9A; font-size: 16px; padding: 0 4px; }
-
-    /* Clock */
-    #clock { text-align: right; }
-    #clock-time { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: #1A1A2E; line-height: 1; }
-    #clock-time .colon { animation: blink 1s step-end infinite; }
-    #clock-date { font-size: 13px; color: #8A8A9A; margin-top: 2px; }
-    .settings-btn {
-      background: none; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      width: 44px; height: 44px; font-size: 20px;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* Content */
-    #content { flex: 1; padding: 20px 24px; overflow-y: auto; }
-
-    /* Empty state */
-    .empty-state {
-      background: #fff; border: 1.5px solid #E8E4DC; border-radius: 16px;
-      padding: 32px; text-align: center; margin-bottom: 20px;
-    }
-    .empty-state .icon { font-size: 36px; margin-bottom: 10px; }
-    .empty-state h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; margin-bottom: 8px; }
-    .empty-state p { font-size: 14px; color: #8A8A9A; margin-bottom: 16px; }
-    .btn-primary {
-      background: #2D6A4F; color: #fff; border: none;
-      border-radius: 12px; padding: 12px 24px; font-size: 15px; font-weight: 700;
-    }
-
-    /* Week nav */
-    .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .week-nav button { background: none; border: none; font-size: 26px; color: #8A8A9A; padding: 4px 14px; border-radius: 8px; }
-    .week-nav span { font-family: 'Playfair Display', serif; font-size: 18px; color: #8A8A9A; }
-
-    /* Day grid */
-    .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-    .day-col {
-      background: #fff; border: 2px solid #E8E4DC; border-radius: 16px;
-      padding: 10px 6px; display: flex; flex-direction: column; gap: 5px;
-      min-height: 160px; overflow: hidden;
-    }
-    .day-col.today { background: #2D6A4F10; border-color: #2D6A4F; }
-    .day-header { text-align: center; margin-bottom: 4px; }
-    .day-name { font-size: 11px; color: #8A8A9A; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-    .day-num {
-      font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
-      color: #1A1A2E; width: 38px; margin: 3px auto 0; line-height: 38px;
-      border-radius: 10px; text-align: center;
-    }
-    .day-col.today .day-num { background: #2D6A4F; color: #fff; }
-    .day-col.today .day-name { color: #2D6A4F; }
-    .event-chip {
-      background: #1A73E815; border-left: 3px solid #1A73E8;
-      border-radius: 7px; padding: 4px 5px; font-size: 11px;
-      color: #1A1A2E; word-break: break-word; line-height: 1.4;
-    }
-    .event-time { color: #1A73E8; font-weight: 700; font-size: 10px; display: block; }
-
-    /* Upcoming list */
-    .upcoming-list { display: flex; flex-direction: column; gap: 8px; }
-    .upcoming-item {
-      display: flex; align-items: center; gap: 12;
-      background: #fff; border: 1.5px solid #E8E4DC;
-      border-radius: 12px; padding: 12px 14px;
-    }
-    .upcoming-item.highlight { background: #1A73E810; border-color: #1A73E844; }
-    .upcoming-date { min-width: 68px; text-align: center; }
-    .upcoming-date-label { font-size: 12px; font-weight: 700; color: #1A73E8; }
-    .upcoming-time-label { font-size: 11px; color: #8A8A9A; }
-    .upcoming-divider { width: 2px; height: 32px; background: #1A73E844; border-radius: 2px; flex-shrink: 0; }
-    .upcoming-title { flex: 1; font-size: 15px; color: #1A1A2E; }
-    .upcoming-title.bold { font-weight: 600; }
-    .badge {
-      font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px;
-    }
-    .badge-green { color: #2D6A4F; background: #2D6A4F18; }
-    .badge-blue { color: #1A73E8; background: #1A73E818; }
-
-    /* Tab bar */
-    #tabbar {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 1200px;
-      background: rgba(247,244,239,0.97);
-      border-top: 1px solid #E8E4DC;
-      display: flex; padding: 8px 16px 12px; gap: 8px; z-index: 20;
-    }
-    .tab-btn {
-      flex: 1; min-height: 48px; border: none; border-radius: 14px;
-      font-size: 14px; font-weight: 700; color: #8A8A9A; background: transparent;
-    }
-    .tab-btn.active { background: #2D6A4F; color: #fff; }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center; z-index: 100;
-    }
-    .modal {
-      background: #fff; border-radius: 20px; padding: 28px;
-      width: min(560px, 90vw); display: flex; flex-direction: column; gap: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    }
-    .modal h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: #1A1A2E; }
-    .modal label { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
-    .modal input {
-      width: 100%; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      padding: 12px 14px; font-size: 14px; background: #FAFAF8; color: #1A1A2E; outline: none;
-    }
-    .modal input:focus { outline: 2px solid #2D6A4F44; }
-    .modal-hint { font-size: 12px; color: #8A8A9A; margin-top: 4px; line-height: 1.6; }
-    .modal-actions { display: flex; gap: 10px; }
-    .modal-actions .btn-primary { flex: 1; }
-    .btn-ghost {
-      background: #F7F4EF; color: #1A1A2E; border: 1.5px solid #E8E4DC;
-      border-radius: 12px; padding: 12px 20px; font-size: 15px;
-    }
-    .status-ok { font-size: 13px; color: #2D6A4F; }
-    .status-error { font-size: 13px; color: #E07A5F; }
-    .status-loading { font-size: 13px; color: #8A8A9A; }
-    .info-box { background: #F7F4EF; border: 1px solid #E8E4DC; border-radius: 12px; padding: 14px; }
-    .info-box h3 { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .info-box p { font-size: 13px; color: #8A8A9A; line-height: 1.6; }
-    .section-title { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; margin-bottom: 12px; }
-    .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 15px; }
-  </style>
-</head>
-<body>
-<div id="app">
-  <div id="header">
-    <div>
-      <div class="logo">Familien<span>board</span></div>
-      <div class="sync-row">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span class="sync-label" id="sync-label">Kein Kalender</span>
-        <button class="refresh-btn" onclick="manualRefresh()">↻</button>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:14px">
-      <div id="clock">
-        <div id="clock-time"><span id="ch">00</span><span class="colon">:</span><span id="cm">00</span></div>
-        <div id="clock-date"></div>
-      </div>
-      <button class="settings-btn" onclick="openSettings()">⚙️</button>
-    </div>
-  </div>
-
-  <div id="content"></div>
-
-  <div id="tabbar">
-    <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Woche</button>
-    <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
-  </div>
-</div>
-
-<!-- Settings Modal -->
-<div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettings(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h2>Einstellungen</h2>
-    <div>
-      <label>Kalender .ics-Link</label>
-      <input type="url" id="ics-input" placeholder="https://calendar.google.com/calendar/ical/…" />
-      <p class="modal-hint">Google Kalender → ⋮ → Einstellungen und Freigabe → „Öffentliche URL im iCal-Format"</p>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-primary" onclick="saveAndFetch()">Speichern & laden</button>
-      <button class="btn-ghost" onclick="document.getElementById('settings-modal').style.display='none'">Schließen</button>
-    </div>
-    <div id="settings-status"></div>
-    <div class="info-box">
-      <h3>Automatische Aktualisierung</h3>
-      <p>Der Kalender wird alle 5 Minuten automatisch aktualisiert. Neue Termine erscheinen ohne manuelle Aktion.</p>
-    </div>
-  </div>
-</div>
-
-<script>
-  const DAYS_SHORT = ["Mo","Di","Mi","Do","Fr","Sa","So"];
-  const DAYS_LONG = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
-  const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-  const MONTHS_SHORT = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-
-  let currentTab = "week";
-  let weekOffset = 0;
-  let icsEvents = [];
-  let icsUrl = "";
-  let syncStatus = "";
-  let lastSync = null;
-
-  // ── Storage ────────────────────────────────────────────────────────────────
-  function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
-  function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
-
-  // ── Clock ──────────────────────────────────────────────────────────────────
-  function updateClock() {
-    const now = new Date();
-    document.getElementById("ch").textContent = String(now.getHours()).padStart(2,"0");
-    document.getElementById("cm").textContent = String(now.getMinutes()).padStart(2,"0");
-    const di = now.getDay() === 0 ? 6 : now.getDay() - 1;
-    document.getElementById("clock-date").textContent = DAYS_LONG[di] + ", " + now.getDate() + ". " + MONTHS[now.getMonth()] + " " + now.getFullYear();
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
-
-  // ── Date helpers ───────────────────────────────────────────────────────────
-  function fmtDate(d) {
-    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-  }
-  function isToday(d) { return fmtDate(d) === fmtDate(new Date()); }
-  function isTomorrow(d) { const t = new Date(); t.setDate(t.getDate()+1); return fmtDate(d) === fmtDate(t); }
-  function getWeekDates(offset) {
-    const now = new Date();
-    const day = now.getDay();
-    const diff = (day === 0 ? -6 : 1 - day) + offset * 7;
-    return Array.from({length:7}, (_,i) => { const d = new Date(now); d.setDate(now.getDate()+diff+i); return d; });
-  }
-
-  // ── iCal parser ────────────────────────────────────────────────────────────
-  function parseIcs(text) {
-    const events = [];
-    const lines = text.split("\n");
-    const unfolded = [];
-    for (const line of lines) {
-      const trimmed = line.replace(/\r$/, "");
-      if ((trimmed.startsWith(" ") || trimmed.startsWith("\t")) && unfolded.length > 0) {
-        unfolded[unfolded.length-1] += trimmed.slice(1);
-      } else { unfolded.push(trimmed); }
-    }
-    let cur = null;
-    for (const line of unfolded) {
-      if (line === "BEGIN:VEVENT") { cur = {}; continue; }
-      if (line === "END:VEVENT" && cur) { if (cur.date && cur.title) events.push(cur); cur = null; continue; }
-      if (!cur) continue;
-      const colon = line.indexOf(":");
-      if (colon === -1) continue;
-      const key = line.slice(0, colon);
-      const val = line.slice(colon+1).trim();
-      if (key === "SUMMARY" || key.startsWith("SUMMARY;")) cur.title = val;
-      if (key === "DTSTART" || key.startsWith("DTSTART;")) {
-        const y=val.slice(0,4), m=val.slice(4,6), d=val.slice(6,8);
-        const hasTime = val.indexOf("T") !== -1;
-        cur.date = y+"-"+m+"-"+d;
-        cur.time = hasTime ? val.slice(9,11)+":"+val.slice(11,13) : "";
-        cur.id = "e_"+Math.random().toString(36).slice(2);
-      }
-    }
-    return events;
-  }
-
-  // ── Fetch ics ──────────────────────────────────────────────────────────────
-  async function fetchIcs(url) {
-    if (!url) return;
-    setSyncStatus("loading");
-    try {
-      const httpUrl = url.replace(/^webcal:\/\//i, "https://");
-      // Use our own Vercel proxy endpoint
-      const res = await fetch("/api/ics?url=" + encodeURIComponent(httpUrl));
-      if (!res.ok) throw new Error("Status " + res.status);
-      const text = await res.text();
-      icsEvents = parseIcs(text);
-      lastSync = new Date();
-      setSyncStatus("ok");
-      render();
-    } catch(e) {
-      setSyncStatus("error");
-    }
-  }
-
-  function setSyncStatus(status) {
-    syncStatus = status;
-    const dot = document.getElementById("sync-dot");
-    const label = document.getElementById("sync-label");
-    dot.className = "sync-dot " + (status === "ok" ? "ok" : status === "error" ? "error" : "");
-    if (status === "ok" && lastSync) {
-      label.textContent = "Sync " + String(lastSync.getHours()).padStart(2,"0") + ":" + String(lastSync.getMinutes()).padStart(2,"0");
-    } else if (status === "loading") {
-      label.textContent = "Lädt…";
-    } else if (status === "error") {
-      label.textContent = "Sync fehlgeschlagen";
-    } else {
-      label.textContent = "Kein Kalender";
-    }
-  }
-
-  function manualRefresh() { if (icsUrl) fetchIcs(icsUrl); }
-
-  // Auto-refresh every 5 minutes
-  setInterval(() => { if (icsUrl) fetchIcs(icsUrl); }, 5 * 60 * 1000);
-
-  // ── Tabs ───────────────────────────────────────────────────────────────────
-  function setTab(tab) {
-    currentTab = tab;
-    document.getElementById("tab-week").className = "tab-btn" + (tab === "week" ? " active" : "");
-    document.getElementById("tab-upcoming").className = "tab-btn" + (tab === "upcoming" ? " active" : "");
-    if (tab === "week") weekOffset = 0;
-    render();
-  }
-
-  // ── Render ─────────────────────────────────────────────────────────────────
-  function render() {
-    const content = document.getElementById("content");
-    let html = "";
-
-    if (!icsUrl) {
-      html += `<div class="empty-state">
-        <div class="icon">📅</div>
-        <h2>Kalender noch nicht verbunden</h2>
-        <p>Tippe auf ⚙️ und füge den .ics-Link deines Google Kalenders ein.</p>
-        <button class="btn-primary" onclick="openSettings()">Kalender verbinden</button>
-      </div>`;
-    }
-
-    if (currentTab === "week") {
-      const weekDates = getWeekDates(weekOffset);
-      const weekLabel = weekOffset === 0 ? "Diese Woche" : weekOffset === 1 ? "Nächste Woche" : weekOffset === -1 ? "Letzte Woche" : (weekOffset > 0 ? "+" : "") + weekOffset + " Wochen";
-      html += `<div class="week-nav">
-        <button onclick="changeWeek(-1)">‹</button>
-        <span>${weekLabel}</span>
-        <button onclick="changeWeek(1)">›</button>
-      </div>
-      <div class="day-grid">`;
-      for (let i = 0; i < 7; i++) {
-        const d = weekDates[i];
-        const key = fmtDate(d);
-        const today = isToday(d);
-        const dayEvs = icsEvents.filter(e => e.date === key).sort((a,b) => (a.time||"").localeCompare(b.time||""));
-        html += `<div class="day-col${today ? " today" : ""}">
-          <div class="day-header">
-            <div class="day-name">${DAYS_SHORT[i]}</div>
-            <div class="day-num">${d.getDate()}</div>
-          </div>`;
-        for (const ev of dayEvs) {
-          html += `<div class="event-chip">${ev.time ? `<span class="event-time">${ev.time}</span>` : ""}${escHtml(ev.title)}</div>`;
-        }
-        html += `</div>`;
-      }
-      html += `</div>`;
-    }
-
-    if (currentTab === "upcoming") {
-      const today = fmtDate(new Date());
-      const upcoming = icsEvents
-        .filter(e => e.date >= today)
-        .sort((a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||""))
-        .slice(0, 10);
-      html += `<div class="section-title">Bevorstehende Termine</div>`;
-      if (upcoming.length === 0) {
-        html += `<div class="no-events">Keine bevorstehenden Termine</div>`;
-      } else {
-        html += `<div class="upcoming-list">`;
-        for (const ev of upcoming) {
-          const d = new Date(ev.date + "T12:00:00");
-          const di = d.getDay() === 0 ? 6 : d.getDay() - 1;
-          const dateStr = DAYS_SHORT[di] + " " + d.getDate() + ". " + MONTHS_SHORT[d.getMonth()];
-          const hl = ev.date === today || isTomorrow(d);
-          const badge = ev.date === today
-            ? `<span class="badge badge-green">Heute</span>`
-            : isTomorrow(d) ? `<span class="badge badge-blue">Morgen</span>` : "";
-          html += `<div class="upcoming-item${hl ? " highlight" : ""}">
-            <div class="upcoming-date">
-              <div class="upcoming-date-label">${dateStr}</div>
-              ${ev.time ? `<div class="upcoming-time-label">${ev.time}</div>` : ""}
-            </div>
-            <div class="upcoming-divider"></div>
-            <div class="upcoming-title${hl ? " bold" : ""}">${escHtml(ev.title)}</div>
-            ${badge}
-          </div>`;
-        }
-        html += `</div>`;
-      }
-    }
-
-    content.innerHTML = html;
-  }
-
-  function escHtml(s) {
-    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }
-
-  function changeWeek(dir) {
-    weekOffset += dir;
-    render();
-  }
-
-  // ── Settings ───────────────────────────────────────────────────────────────
-  function openSettings() {
-    document.getElementById("ics-input").value = icsUrl || "";
-    document.getElementById("settings-status").innerHTML = "";
-    document.getElementById("settings-modal").style.display = "flex";
-  }
-
-  function closeSettings(e) {
-    if (e.target === document.getElementById("settings-modal")) {
-      document.getElementById("settings-modal").style.display = "none";
-    }
-  }
-
-  async function saveAndFetch() {
-    const url = document.getElementById("ics-input").value.trim();
-    if (!url) return;
-    icsUrl = url;
-    lsSet("cal_ics", url);
-    document.getElementById("settings-status").innerHTML = `<p class="status-loading">⏳ Wird geladen…</p>`;
-    await fetchIcs(url);
-    if (syncStatus === "ok") {
-      document.getElementById("settings-status").innerHTML = `<p class="status-ok">✓ ${icsEvents.length} Termine geladen</p>`;
-    } else {
-      document.getElementById("settings-status").innerHTML = `<p class="status-error">⚠️ Laden fehlgeschlagen – ist der Kalender öffentlich zugänglich?</p>`;
-    }
-    render();
-  }
-
-  // ── Init ───────────────────────────────────────────────────────────────────
-  const savedUrl = lsGet("cal_ics");
-  if (savedUrl) { icsUrl = savedUrl; fetchIcs(savedUrl); }
-  render();
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Familienboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { -webkit-text-size-adjust: 100%; }
-    body {
-      background: #F7F4EF;
-      font-family: 'DM Sans', sans-serif;
-      overscroll-behavior: none;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      min-height: 100dvh;
-    }
-    button { touch-action: manipulation; font-family: 'DM Sans', sans-serif; cursor: pointer; }
-    input { font-family: 'DM Sans', sans-serif; user-select: text; -webkit-user-select: text; }
-    @keyframes blink { 50% { opacity: 0.2; } }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: #E8E4DC; border-radius: 4px; }
-
-    /* Layout */
-    #app { display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; min-height: 100dvh; padding-bottom: 68px; }
-
-    /* Header */
-    #header {
-      padding: 16px 24px 12px;
-      border-bottom: 1px solid #E8E4DC;
-      background: #F7F4EF;
-      position: sticky; top: 0; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .logo { font-family: 'Playfair Display', serif; font-size: 28px; color: #1A1A2E; font-weight: 700; }
-    .logo span { color: #2D6A4F; }
-    .sync-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
-    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #8A8A9A; }
-    .sync-dot.ok { background: #2D6A4F; }
-    .sync-dot.error { background: #E07A5F; }
-    .sync-label { font-size: 12px; color: #8A8A9A; }
-    .refresh-btn { background: none; border: none; color: #8A8A9A; font-size: 16px; padding: 0 4px; }
-
-    /* Clock */
-    #clock { text-align: right; }
-    #clock-time { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: #1A1A2E; line-height: 1; }
-    #clock-time .colon { animation: blink 1s step-end infinite; }
-    #clock-date { font-size: 13px; color: #8A8A9A; margin-top: 2px; }
-    .settings-btn {
-      background: none; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      width: 44px; height: 44px; font-size: 20px;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* Content */
-    #content { flex: 1; padding: 20px 24px; overflow-y: auto; }
-
-    /* Empty state */
-    .empty-state {
-      background: #fff; border: 1.5px solid #E8E4DC; border-radius: 16px;
-      padding: 32px; text-align: center; margin-bottom: 20px;
-    }
-    .empty-state .icon { font-size: 36px; margin-bottom: 10px; }
-    .empty-state h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; margin-bottom: 8px; }
-    .empty-state p { font-size: 14px; color: #8A8A9A; margin-bottom: 16px; }
-    .btn-primary {
-      background: #2D6A4F; color: #fff; border: none;
-      border-radius: 12px; padding: 12px 24px; font-size: 15px; font-weight: 700;
-    }
-
-    /* Week nav */
-    .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .week-nav button { background: none; border: none; font-size: 26px; color: #8A8A9A; padding: 4px 14px; border-radius: 8px; }
-    .week-nav span { font-family: 'Playfair Display', serif; font-size: 18px; color: #8A8A9A; }
-
-    /* Day grid */
-    .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-    .day-col {
-      background: #fff; border: 2px solid #E8E4DC; border-radius: 16px;
-      padding: 10px 6px; display: flex; flex-direction: column; gap: 5px;
-      min-height: 160px; overflow: hidden;
-    }
-    .day-col.today { background: #2D6A4F10; border-color: #2D6A4F; }
-    .day-header { text-align: center; margin-bottom: 4px; }
-    .day-name { font-size: 11px; color: #8A8A9A; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-    .day-num {
-      font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
-      color: #1A1A2E; width: 38px; margin: 3px auto 0; line-height: 38px;
-      border-radius: 10px; text-align: center;
-    }
-    .day-col.today .day-num { background: #2D6A4F; color: #fff; }
-    .day-col.today .day-name { color: #2D6A4F; }
-    .event-chip {
-      background: #1A73E815; border-left: 3px solid #1A73E8;
-      border-radius: 7px; padding: 4px 5px; font-size: 11px;
-      color: #1A1A2E; word-break: break-word; line-height: 1.4;
-    }
-    .event-time { color: #1A73E8; font-weight: 700; font-size: 10px; display: block; }
-
-    /* Upcoming list */
-    .upcoming-list { display: flex; flex-direction: column; gap: 8px; }
-    .upcoming-item {
-      display: flex; align-items: center; gap: 12;
-      background: #fff; border: 1.5px solid #E8E4DC;
-      border-radius: 12px; padding: 12px 14px;
-    }
-    .upcoming-item.highlight { background: #1A73E810; border-color: #1A73E844; }
-    .upcoming-date { min-width: 68px; text-align: center; }
-    .upcoming-date-label { font-size: 12px; font-weight: 700; color: #1A73E8; }
-    .upcoming-time-label { font-size: 11px; color: #8A8A9A; }
-    .upcoming-divider { width: 2px; height: 32px; background: #1A73E844; border-radius: 2px; flex-shrink: 0; }
-    .upcoming-title { flex: 1; font-size: 15px; color: #1A1A2E; }
-    .upcoming-title.bold { font-weight: 600; }
-    .badge {
-      font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px;
-    }
-    .badge-green { color: #2D6A4F; background: #2D6A4F18; }
-    .badge-blue { color: #1A73E8; background: #1A73E818; }
-
-    /* Tab bar */
-    #tabbar {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 1200px;
-      background: rgba(247,244,239,0.97);
-      border-top: 1px solid #E8E4DC;
-      display: flex; padding: 8px 16px 12px; gap: 8px; z-index: 20;
-    }
-    .tab-btn {
-      flex: 1; min-height: 48px; border: none; border-radius: 14px;
-      font-size: 14px; font-weight: 700; color: #8A8A9A; background: transparent;
-    }
-    .tab-btn.active { background: #2D6A4F; color: #fff; }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center; z-index: 100;
-    }
-    .modal {
-      background: #fff; border-radius: 20px; padding: 28px;
-      width: min(560px, 90vw); display: flex; flex-direction: column; gap: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    }
-    .modal h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: #1A1A2E; }
-    .modal label { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
-    .modal input {
-      width: 100%; border: 1.5px solid #E8E4DC; border-radius: 12px;
-      padding: 12px 14px; font-size: 14px; background: #FAFAF8; color: #1A1A2E; outline: none;
-    }
-    .modal input:focus { outline: 2px solid #2D6A4F44; }
-    .modal-hint { font-size: 12px; color: #8A8A9A; margin-top: 4px; line-height: 1.6; }
-    .modal-actions { display: flex; gap: 10px; }
-    .modal-actions .btn-primary { flex: 1; }
-    .btn-ghost {
-      background: #F7F4EF; color: #1A1A2E; border: 1.5px solid #E8E4DC;
-      border-radius: 12px; padding: 12px 20px; font-size: 15px;
-    }
-    .status-ok { font-size: 13px; color: #2D6A4F; }
-    .status-error { font-size: 13px; color: #E07A5F; }
-    .status-loading { font-size: 13px; color: #8A8A9A; }
-    .info-box { background: #F7F4EF; border: 1px solid #E8E4DC; border-radius: 12px; padding: 14px; }
-    .info-box h3 { font-size: 13px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .info-box p { font-size: 13px; color: #8A8A9A; line-height: 1.6; }
-    .section-title { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; margin-bottom: 12px; }
-    .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 15px; }
-  </style>
-</head>
-<body>
-<div id="app">
-  <div id="header">
-    <div>
-      <div class="logo">Familien<span>board</span></div>
-      <div class="sync-row">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span class="sync-label" id="sync-label">Kein Kalender</span>
-        <button class="refresh-btn" onclick="manualRefresh()">↻</button>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:14px">
-      <div id="clock">
-        <div id="clock-time"><span id="ch">00</span><span class="colon">:</span><span id="cm">00</span></div>
-        <div id="clock-date"></div>
-      </div>
-      <button class="settings-btn" onclick="openSettings()">⚙️</button>
-    </div>
-  </div>
-
-  <div id="content"></div>
-
-  <div id="tabbar">
-    <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Woche</button>
-    <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
-  </div>
-</div>
-
-<!-- Settings Modal -->
-<div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettings(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h2>Einstellungen</h2>
-    <div>
-      <label>Kalender .ics-Link</label>
-      <input type="url" id="ics-input" placeholder="https://calendar.google.com/calendar/ical/…" />
-      <p class="modal-hint">Google Kalender → ⋮ → Einstellungen und Freigabe → „Öffentliche URL im iCal-Format"</p>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-primary" onclick="saveAndFetch()">Speichern & laden</button>
-      <button class="btn-ghost" onclick="document.getElementById('settings-modal').style.display='none'">Schließen</button>
-    </div>
-    <div id="settings-status"></div>
-    <div class="info-box">
-      <h3>Automatische Aktualisierung</h3>
-      <p>Der Kalender wird alle 5 Minuten automatisch aktualisiert. Neue Termine erscheinen ohne manuelle Aktion.</p>
-    </div>
-  </div>
-</div>
-
-<script>
-  const DAYS_SHORT = ["Mo","Di","Mi","Do","Fr","Sa","So"];
-  const DAYS_LONG = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
-  const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-  const MONTHS_SHORT = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-
-  let currentTab = "week";
-  let weekOffset = 0;
-  let icsEvents = [];
-  let icsUrl = "";
-  let syncStatus = "";
-  let lastSync = null;
-
-  // ── Storage ────────────────────────────────────────────────────────────────
-  function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
-  function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
-
-  // ── Clock ──────────────────────────────────────────────────────────────────
-  function updateClock() {
-    const now = new Date();
-    document.getElementById("ch").textContent = String(now.getHours()).padStart(2,"0");
-    document.getElementById("cm").textContent = String(now.getMinutes()).padStart(2,"0");
-    const di = now.getDay() === 0 ? 6 : now.getDay() - 1;
-    document.getElementById("clock-date").textContent = DAYS_LONG[di] + ", " + now.getDate() + ". " + MONTHS[now.getMonth()] + " " + now.getFullYear();
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
-
-  // ── Date helpers ───────────────────────────────────────────────────────────
-  function fmtDate(d) {
-    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-  }
-  function isToday(d) { return fmtDate(d) === fmtDate(new Date()); }
-  function isTomorrow(d) { const t = new Date(); t.setDate(t.getDate()+1); return fmtDate(d) === fmtDate(t); }
-  function getWeekDates(offset) {
-    const now = new Date();
-    const day = now.getDay();
-    const diff = (day === 0 ? -6 : 1 - day) + offset * 7;
-    return Array.from({length:7}, (_,i) => { const d = new Date(now); d.setDate(now.getDate()+diff+i); return d; });
-  }
-
-  // ── iCal parser ────────────────────────────────────────────────────────────
-  function parseIcs(text) {
-    const events = [];
-    const lines = text.split("\n");
-    const unfolded = [];
-    for (const line of lines) {
-      const trimmed = line.replace(/\r$/, "");
-      if ((trimmed.startsWith(" ") || trimmed.startsWith("\t")) && unfolded.length > 0) {
-        unfolded[unfolded.length-1] += trimmed.slice(1);
-      } else { unfolded.push(trimmed); }
-    }
-    let cur = null;
-    for (const line of unfolded) {
-      if (line === "BEGIN:VEVENT") { cur = {}; continue; }
-      if (line === "END:VEVENT" && cur) { if (cur.date && cur.title) events.push(cur); cur = null; continue; }
-      if (!cur) continue;
-      const colon = line.indexOf(":");
-      if (colon === -1) continue;
-      const key = line.slice(0, colon);
-      const val = line.slice(colon+1).trim();
-      if (key === "SUMMARY" || key.startsWith("SUMMARY;")) cur.title = val;
-      if (key === "DTSTART" || key.startsWith("DTSTART;")) {
-        const y=val.slice(0,4), m=val.slice(4,6), d=val.slice(6,8);
-        const hasTime = val.indexOf("T") !== -1;
-        cur.date = y+"-"+m+"-"+d;
-        cur.time = hasTime ? val.slice(9,11)+":"+val.slice(11,13) : "";
-        cur.id = "e_"+Math.random().toString(36).slice(2);
-      }
-    }
-    return events;
-  }
-
-  // ── Fetch ics ──────────────────────────────────────────────────────────────
-  async function fetchIcs(url) {
-    if (!url) return;
-    setSyncStatus("loading");
-    try {
-      const httpUrl = url.replace(/^webcal:\/\//i, "https://");
-      // Use our own Vercel proxy endpoint
-      const res = await fetch("/api/ics?url=" + encodeURIComponent(httpUrl));
-      if (!res.ok) throw new Error("Status " + res.status);
-      const text = await res.text();
-      icsEvents = parseIcs(text);
-      lastSync = new Date();
-      setSyncStatus("ok");
-      render();
-    } catch(e) {
-      setSyncStatus("error");
-    }
-  }
-
-  function setSyncStatus(status) {
-    syncStatus = status;
-    const dot = document.getElementById("sync-dot");
-    const label = document.getElementById("sync-label");
-    dot.className = "sync-dot " + (status === "ok" ? "ok" : status === "error" ? "error" : "");
-    if (status === "ok" && lastSync) {
-      label.textContent = "Sync " + String(lastSync.getHours()).padStart(2,"0") + ":" + String(lastSync.getMinutes()).padStart(2,"0");
-    } else if (status === "loading") {
-      label.textContent = "Lädt…";
-    } else if (status === "error") {
-      label.textContent = "Sync fehlgeschlagen";
-    } else {
-      label.textContent = "Kein Kalender";
-    }
-  }
-
-  function manualRefresh() { if (icsUrl) fetchIcs(icsUrl); }
-
-  // Auto-refresh every 5 minutes
-  setInterval(() => { if (icsUrl) fetchIcs(icsUrl); }, 5 * 60 * 1000);
-
-  // ── Tabs ───────────────────────────────────────────────────────────────────
-  function setTab(tab) {
-    currentTab = tab;
-    document.getElementById("tab-week").className = "tab-btn" + (tab === "week" ? " active" : "");
-    document.getElementById("tab-upcoming").className = "tab-btn" + (tab === "upcoming" ? " active" : "");
-    if (tab === "week") weekOffset = 0;
-    render();
-  }
-
-  // ── Render ─────────────────────────────────────────────────────────────────
-  function render() {
-    const content = document.getElementById("content");
-    let html = "";
-
-    if (!icsUrl) {
-      html += `<div class="empty-state">
-        <div class="icon">📅</div>
-        <h2>Kalender noch nicht verbunden</h2>
-        <p>Tippe auf ⚙️ und füge den .ics-Link deines Google Kalenders ein.</p>
-        <button class="btn-primary" onclick="openSettings()">Kalender verbinden</button>
-      </div>`;
-    }
-
-    if (currentTab === "week") {
-      const weekDates = getWeekDates(weekOffset);
-      const weekLabel = weekOffset === 0 ? "Diese Woche" : weekOffset === 1 ? "Nächste Woche" : weekOffset === -1 ? "Letzte Woche" : (weekOffset > 0 ? "+" : "") + weekOffset + " Wochen";
-      html += `<div class="week-nav">
-        <button onclick="changeWeek(-1)">‹</button>
-        <span>${weekLabel}</span>
-        <button onclick="changeWeek(1)">›</button>
-      </div>
-      <div class="day-grid">`;
-      for (let i = 0; i < 7; i++) {
-        const d = weekDates[i];
-        const key = fmtDate(d);
-        const today = isToday(d);
-        const dayEvs = icsEvents.filter(e => e.date === key).sort((a,b) => (a.time||"").localeCompare(b.time||""));
-        html += `<div class="day-col${today ? " today" : ""}">
-          <div class="day-header">
-            <div class="day-name">${DAYS_SHORT[i]}</div>
-            <div class="day-num">${d.getDate()}</div>
-          </div>`;
-        for (const ev of dayEvs) {
-          html += `<div class="event-chip">${ev.time ? `<span class="event-time">${ev.time}</span>` : ""}${escHtml(ev.title)}</div>`;
-        }
-        html += `</div>`;
-      }
-      html += `</div>`;
-    }
-
-    if (currentTab === "upcoming") {
-      const today = fmtDate(new Date());
-      const upcoming = icsEvents
-        .filter(e => e.date >= today)
-        .sort((a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||""))
-        .slice(0, 10);
-      html += `<div class="section-title">Bevorstehende Termine</div>`;
-      if (upcoming.length === 0) {
-        html += `<div class="no-events">Keine bevorstehenden Termine</div>`;
-      } else {
-        html += `<div class="upcoming-list">`;
-        for (const ev of upcoming) {
-          const d = new Date(ev.date + "T12:00:00");
-          const di = d.getDay() === 0 ? 6 : d.getDay() - 1;
-          const dateStr = DAYS_SHORT[di] + " " + d.getDate() + ". " + MONTHS_SHORT[d.getMonth()];
-          const hl = ev.date === today || isTomorrow(d);
-          const badge = ev.date === today
-            ? `<span class="badge badge-green">Heute</span>`
-            : isTomorrow(d) ? `<span class="badge badge-blue">Morgen</span>` : "";
-          html += `<div class="upcoming-item${hl ? " highlight" : ""}">
-            <div class="upcoming-date">
-              <div class="upcoming-date-label">${dateStr}</div>
-              ${ev.time ? `<div class="upcoming-time-label">${ev.time}</div>` : ""}
-            </div>
-            <div class="upcoming-divider"></div>
-            <div class="upcoming-title${hl ? " bold" : ""}">${escHtml(ev.title)}</div>
-            ${badge}
-          </div>`;
-        }
-        html += `</div>`;
-      }
-    }
-
-    content.innerHTML = html;
-  }
-
-  function escHtml(s) {
-    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }
-
-  function changeWeek(dir) {
-    weekOffset += dir;
-    render();
-  }
-
-  // ── Settings ───────────────────────────────────────────────────────────────
-  function openSettings() {
-    document.getElementById("ics-input").value = icsUrl || "";
-    document.getElementById("settings-status").innerHTML = "";
-    document.getElementById("settings-modal").style.display = "flex";
-  }
-
-  function closeSettings(e) {
-    if (e.target === document.getElementById("settings-modal")) {
-      document.getElementById("settings-modal").style.display = "none";
-    }
-  }
-
-  async function saveAndFetch() {
-    const url = document.getElementById("ics-input").value.trim();
-    if (!url) return;
-    icsUrl = url;
-    lsSet("cal_ics", url);
-    document.getElementById("settings-status").innerHTML = `<p class="status-loading">⏳ Wird geladen…</p>`;
-    await fetchIcs(url);
-    if (syncStatus === "ok") {
-      document.getElementById("settings-status").innerHTML = `<p class="status-ok">✓ ${icsEvents.length} Termine geladen</p>`;
-    } else {
-      document.getElementById("settings-status").innerHTML = `<p class="status-error">⚠️ Laden fehlgeschlagen – ist der Kalender öffentlich zugänglich?</p>`;
-    }
-    render();
-  }
-
-  // ── Init ───────────────────────────────────────────────────────────────────
-  const savedUrl = lsGet("cal_ics");
-  if (savedUrl) { icsUrl = savedUrl; fetchIcs(savedUrl); }
-  render();
-</script>
-</body>
-</html>
 
