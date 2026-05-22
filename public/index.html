@@ -44,12 +44,13 @@
     #cal-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 12px 0px 18px; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 
     /* Tab bar - inside cal panel */
-    #tabbar { display: flex; gap: 12px; padding: 8px 18px 10px; justify-content: center; flex-shrink: 0; border-top: 1px solid #E8E4DC; background: #F7F4EF; margin-bottom: 76px; }
+    #tabbar { display: flex; gap: 12px; padding: 8px 18px 10px; justify-content: center; flex-shrink: 0; border-top: 1px solid #E8E4DC; background: #F7F4EF; }
     .tab-btn { min-height: 48px; border: 2px solid #E8E4DC; border-radius: 14px; font-size: 16px; font-weight: 700; color: #8A8A9A; background: #fff; padding: 0 36px; }
     .tab-btn.active { background: #2D6A4F; color: #fff; }
 
     /* Weather strip - full width, fixed at bottom */
-    #weather-strip { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1400px; padding: 7px 18px 8px; border-top: 1px solid #E8E4DC; background: rgba(247,244,239,0.97); display: flex; gap: 10px; align-items: stretch; z-index: 15; flex-shrink: 0; }
+    #bottom-bar { flex-shrink: 0; border-top: 1px solid #E8E4DC; background: #F7F4EF; }
+    #weather-strip { padding: 7px 18px 8px; border-top: 1px solid #E8E4DC; background: #F7F4EF; display: flex; gap: 10px; align-items: stretch; flex-shrink: 0; }
     .wx-now { background: #fff; border: 1.5px solid #E8E4DC; border-radius: 10px; padding: 7px 12px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; min-width: 180px; }
     .wx-icon { font-size: 30px; line-height: 1; }
     .wx-temp-big { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #1A1A2E; line-height: 1; }
