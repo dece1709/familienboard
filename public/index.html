@@ -22,7 +22,7 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-thumb { background: #E8E4DC; border-radius: 4px; }
 
-    #app { display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; min-height: 100dvh; padding-bottom: 148px; }
+    #app { display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; min-height: 100dvh; padding-bottom: 76px; }
 
     #header {
       padding: 12px 20px 10px; border-bottom: 1px solid #E8E4DC;
@@ -43,10 +43,11 @@
     #clock-date { font-size: 11px; color: #8A8A9A; margin-top: 1px; }
     .settings-btn { background: none; border: 1.5px solid #E8E4DC; border-radius: 10px; width: 38px; height: 38px; font-size: 17px; display: flex; align-items: center; justify-content: center; }
 
-    #main { flex: 1; display: flex; overflow: hidden; }
+    #main { flex: 1; display: flex; overflow: hidden; min-height: 0; }
 
     /* Calendar panel */
-    #cal-panel { flex: 1; padding: 12px 14px 12px 20px; overflow-y: auto; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+    #cal-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+    #cal-scroll { flex: 1; overflow-y: auto; padding: 12px 14px 8px 20px; display: flex; flex-direction: column; gap: 14px; }
 
     /* Two-week grid */
     .week-block { display: flex; flex-direction: column; gap: 6px; }
@@ -117,7 +118,7 @@
     .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 14px; }
 
     /* Tab bar */
-    #tabbar { position: fixed; bottom: 76px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1400px; background: rgba(247,244,239,0.97); border-top: 1px solid #E8E4DC; border-bottom: 1px solid #E8E4DC; display: flex; padding: 7px 14px 11px; gap: 8px; z-index: 20; }
+    #tabbar { background: rgba(247,244,239,0.97); border-top: 1px solid #E8E4DC; display: flex; padding: 7px 14px 9px; gap: 8px; flex-shrink: 0; }
     .tab-btn { flex: 1; min-height: 44px; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; color: #8A8A9A; background: transparent; }
     .tab-btn.active { background: #2D6A4F; color: #fff; }
 
@@ -157,7 +158,7 @@
     #weather-strip {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 1400px;
-      padding: 8px 16px 8px;
+      padding: 8px 20px 10px;
       border-top: 1px solid #E8E4DC;
       background: rgba(247,244,239,0.97);
       display: flex; gap: 10px; align-items: stretch;
@@ -206,7 +207,13 @@
   </div>
 
   <div id="main">
-    <div id="cal-panel"></div>
+    <div id="cal-panel">
+      <div id="cal-scroll"></div>
+      <div id="tabbar">
+        <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Diese & nächste Woche</button>
+        <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
+      </div>
+    </div>
     <div id="shop-panel">
       <div class="shop-header">
         <div>
@@ -228,10 +235,7 @@
   </div>
 
 
-  <div id="tabbar">
-    <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Diese & nächste Woche</button>
-    <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
-  </div>
+
 </div>
 
   <div id="weather-strip"><span class="wx-loading">⏳ Wetter wird geladen…</span></div>
@@ -500,7 +504,7 @@
   }
 
   function renderCal() {
-    const panel = document.getElementById("cal-panel");
+    const panel = document.getElementById("cal-scroll");
     const events = allEvents();
     let html = "";
 
