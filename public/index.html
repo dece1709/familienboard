@@ -41,7 +41,7 @@
 
     /* Calendar panel */
     #cal-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; padding-bottom: 74px; }
-    #cal-scroll { flex: 0; overflow: visible; padding: 8px 12px 0px 18px; display: flex; flex-direction: column; gap: 8px; }
+    #cal-scroll { flex: 1; overflow-y: auto; padding: 8px 12px 0px 18px; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 
     /* Tab bar - inside cal panel */
     #tabbar { display: flex; gap: 12px; padding: 8px 18px 10px; justify-content: center; flex-shrink: 0; border-top: 1px solid #E8E4DC; background: #F7F4EF; }
@@ -80,6 +80,9 @@
     .event-chip { border-radius: 4px; padding: 2px 4px; font-size: 10px; color: #1A1A2E; word-break: break-word; line-height: 1.3; }
     .event-time { font-weight: 700; font-size: 9px; display: block; }
     .more-badge { font-size: 9px; font-weight: 700; color: #8A8A9A; background: #F0EDE8; border-radius: 4px; padding: 1px 4px; text-align: center; }
+    .day-full-date { font-size: 9px; color: #8A8A9A; text-align: center; margin-top: 1px; }
+    .day-col.today .day-full-date { color: #2D6A4F; }
+    .current-week { scroll-margin-top: 8px; }
 
     /* Upcoming */
     .upcoming-list { display: flex; flex-direction: column; gap: 7px; }
@@ -404,20 +407,53 @@
   }
   function closeDayPopup(e) { if (e.target === document.getElementById("day-popup")) document.getElementById("day-popup").style.display = "none"; }
 
-  function renderWeekBlock(offset, labelText, isCurrent) {
+  // Infinite scroll state
+  let calStartOffset = -4;
+  let calEndOffset = 52;
+  let infiniteObserver = null;
+
+  function getISOWeek(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  }
+
+  function renderWeekBlock(offset) {
     const weekDates = getWeekDates(offset);
     const events = allEvents();
-    let html = '<div class="week-block"><div class="week-label' + (isCurrent ? " current" : "") + '">' + labelText + '</div><div class="day-grid">';
+    const thisWeekStart = fmtDate(getWeekDates(0)[0]);
+    const blockStart = fmtDate(weekDates[0]);
+    const isCurrent = blockStart === thisWeekStart;
+    let labelText;
+    if (offset === 0) labelText = "Diese Woche";
+    else if (offset === 1) labelText = "Nächste Woche";
+    else if (offset === -1) labelText = "Letzte Woche";
+    else {
+      const mon = weekDates[0]; const sun = weekDates[6];
+      labelText = "KW " + getISOWeek(mon) + " · " + mon.getDate() + "." + (mon.getMonth()+1) + " – " + sun.getDate() + "." + (sun.getMonth()+1) + "." + sun.getFullYear();
+    }
+    let html = '<div class="week-block' + (isCurrent ? " current-week" : "") + '" data-offset="' + offset + '">';
+    html += '<div class="week-label' + (isCurrent ? " current" : "") + '">' + labelText + '</div>';
+    html += '<div class="day-grid">';
     for (let i = 0; i < 7; i++) {
       const d = weekDates[i];
       const key = fmtDate(d);
       const today = isToday(d);
+      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const yyyy = d.getFullYear();
+      const dayLabel = DAYS_LONG[i] + ", " + d.getDate() + ". " + MONTHS[d.getMonth()];
       const dayEvs = events.filter(e => e.date === key).sort((a,b) => (a.time||"").localeCompare(b.time||""));
       const shown = dayEvs.slice(0, MAX_EV);
       const hidden = dayEvs.length - shown.length;
-      const dayLabel = DAYS_LONG[i] + ", " + d.getDate() + ". " + MONTHS[d.getMonth()];
       html += '<div class="day-col' + (today ? " today" : "") + '" onclick="showDayPopup(\'' + key + '\',\'' + dayLabel + '\')">';
-      html += '<div class="day-header"><div class="day-name">' + DAYS_SHORT[i] + '</div><div class="day-num">' + d.getDate() + '</div></div>';
+      html += '<div class="day-header">';
+      html += '<div class="day-name">' + DAYS_SHORT[i] + '</div>';
+      html += '<div class="day-num">' + d.getDate() + '</div>';
+      html += '<div class="day-full-date">' + dd + '.' + mm + '.' + yyyy + '</div>';
+      html += '</div>';
       for (const ev of shown) {
         html += '<div class="event-chip" style="background:' + ev.calColor + '15;border-left:3px solid ' + ev.calColor + '">';
         if (ev.time) html += '<span class="event-time" style="color:' + ev.calColor + '">' + ev.time + '</span>';
@@ -435,22 +471,32 @@
     document.getElementById("tab-week").className = "tab-btn" + (tab === "week" ? " active" : "");
     document.getElementById("tab-upcoming").className = "tab-btn" + (tab === "upcoming" ? " active" : "");
     document.getElementById("shop-panel").style.display = tab === "week" ? "flex" : "none";
+    if (tab === "week") { calStartOffset = -4; calEndOffset = 52; }
     renderCal();
+    if (tab === "week") setTimeout(scrollToCurrentWeek, 80);
+  }
+
+  function scrollToCurrentWeek() {
+    const el = document.querySelector(".current-week");
+    if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
   }
 
   function renderCal() {
     const panel = document.getElementById("cal-scroll");
-    const events = allEvents();
+    if (infiniteObserver) { infiniteObserver.disconnect(); infiniteObserver = null; }
     let html = "";
     if (currentTab === "week") {
-      html += renderWeekBlock(0, "Diese Woche", true);
-      html += renderWeekBlock(1, "Nächste Woche", false);
+      html += '<div id="cal-top-sentinel" style="height:1px"></div>';
+      for (let i = calStartOffset; i <= calEndOffset; i++) html += renderWeekBlock(i);
+      html += '<div id="cal-bottom-sentinel" style="height:1px"></div>';
+      panel.innerHTML = html;
+      setupInfiniteScroll(panel);
     }
     if (currentTab === "upcoming") {
       const today = fmtDate(new Date());
-      const upcoming = events.filter(e => e.date >= today)
+      const upcoming = allEvents().filter(e => e.date >= today)
         .sort((a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||""))
-        .slice(0, 15);
+        .slice(0, 50);
       html += '<div class="section-title">Bevorstehende Termine</div>';
       if (upcoming.length === 0) {
         html += '<div class="no-events">Keine bevorstehenden Termine</div>';
@@ -470,8 +516,42 @@
         }
         html += '</div>';
       }
+      panel.innerHTML = html;
     }
-    panel.innerHTML = html;
+  }
+
+  function setupInfiniteScroll(panel) {
+    infiniteObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        if (entry.target.id === "cal-bottom-sentinel") {
+          calEndOffset += 8;
+          const sentinel = document.getElementById("cal-bottom-sentinel");
+          for (let i = calEndOffset - 7; i <= calEndOffset; i++) {
+            const tmp = document.createElement("div");
+            tmp.innerHTML = renderWeekBlock(i);
+            panel.insertBefore(tmp.firstChild, sentinel);
+          }
+        }
+        if (entry.target.id === "cal-top-sentinel") {
+          const prevStart = calStartOffset;
+          calStartOffset -= 8;
+          const sentinel = document.getElementById("cal-top-sentinel");
+          const scrollBefore = panel.scrollHeight;
+          const scrollTopBefore = panel.scrollTop;
+          for (let i = prevStart - 1; i >= calStartOffset; i--) {
+            const tmp = document.createElement("div");
+            tmp.innerHTML = renderWeekBlock(i);
+            sentinel.after(tmp.firstChild);
+          }
+          panel.scrollTop = scrollTopBefore + (panel.scrollHeight - scrollBefore);
+        }
+      });
+    }, { root: panel, threshold: 0.1 });
+    const top = document.getElementById("cal-top-sentinel");
+    const bot = document.getElementById("cal-bottom-sentinel");
+    if (top) infiniteObserver.observe(top);
+    if (bot) infiniteObserver.observe(bot);
   }
 
   function escHtml(s) { return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
