@@ -513,7 +513,19 @@
     }
     if (currentTab === "upcoming") {
       const today = fmtDate(new Date());
-      const upcoming = allEvents().filter(e => e.date >= today)
+      // Deduplicate multi-day events
+      const allEv = allEvents().filter(e => e.date >= today);
+      const seen = new Map();
+      for (const ev of allEv) {
+        const baseId = ev.id.replace(/_\d{4}-\d{2}-\d{2}$/, "");
+        if (!seen.has(baseId)) {
+          seen.set(baseId, { ...ev, endDate: ev.date });
+        } else {
+          const ex = seen.get(baseId);
+          if (ev.date > ex.endDate) ex.endDate = ev.date;
+        }
+      }
+      const upcoming = Array.from(seen.values())
         .sort((a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||""))
         .slice(0, 50);
       html += '<div class="section-title">Bevorstehende Termine</div>';
@@ -524,11 +536,19 @@
         for (const ev of upcoming) {
           const d = new Date(ev.date + "T12:00:00");
           const di = d.getDay() === 0 ? 6 : d.getDay() - 1;
-          const dateStr = DAYS_SHORT[di] + " " + d.getDate() + ". " + MONTHS_SHORT[d.getMonth()];
+          const isMulti = ev.endDate && ev.endDate > ev.date;
+          let dateStr;
+          if (isMulti) {
+            const ds = ev.date.slice(8,10) + "." + ev.date.slice(5,7) + ".";
+            const de = ev.endDate.slice(8,10) + "." + ev.endDate.slice(5,7) + "." + ev.endDate.slice(0,4);
+            dateStr = ds + "–" + de;
+          } else {
+            dateStr = DAYS_SHORT[di] + " " + d.getDate() + ". " + MONTHS_SHORT[d.getMonth()];
+          }
           const hl = ev.date === today || isTomorrow(d);
           const badge = ev.date === today ? '<span class="badge badge-green">Heute</span>' : isTomorrow(d) ? '<span class="badge badge-blue">Morgen</span>' : "";
           html += '<div class="upcoming-item' + (hl ? " highlight" : "") + '">';
-          html += '<div class="upcoming-date"><div class="upcoming-date-label" style="color:' + ev.calColor + '">' + dateStr + '</div>';
+          html += '<div class="upcoming-date"><div class="upcoming-date-label" style="color:' + ev.calColor + ';font-size:11px">' + dateStr + '</div>';
           if (ev.time) html += '<div class="upcoming-time-label">' + ev.time + '</div>';
           html += '</div><div class="upcoming-divider" style="background:' + ev.calColor + '44"></div>';
           html += '<div class="upcoming-title' + (hl ? " bold" : "") + '">' + escHtml(ev.title) + '</div>' + badge + '</div>';
