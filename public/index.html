@@ -40,8 +40,8 @@
     #main { flex: 1; display: flex; overflow: hidden; min-height: 0; }
 
     /* Calendar panel */
-    #cal-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; padding-bottom: 74px; }
-    #cal-scroll { flex: 1; overflow-y: auto; padding: 8px 12px 0px 18px; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+    #cal-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; padding-bottom: 76px; }
+    #cal-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 12px 0px 18px; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 
     /* Tab bar - inside cal panel */
     #tabbar { display: flex; gap: 12px; padding: 8px 18px 10px; justify-content: center; flex-shrink: 0; border-top: 1px solid #E8E4DC; background: #F7F4EF; }
@@ -282,7 +282,7 @@
   }
 
   function parseIcs(text) {
-    const events = [];
+    const rawEvents = [];
     const lines = text.split("\n");
     const unfolded = [];
     for (const line of lines) {
@@ -294,17 +294,35 @@
     let cur = null;
     for (const line of unfolded) {
       if (line === "BEGIN:VEVENT") { cur = {}; continue; }
-      if (line === "END:VEVENT" && cur) { if (cur.date && cur.title) events.push(cur); cur = null; continue; }
+      if (line === "END:VEVENT" && cur) { if (cur.date && cur.title) rawEvents.push(cur); cur = null; continue; }
       if (!cur) continue;
       const colon = line.indexOf(":");
       if (colon === -1) continue;
-      const key = line.slice(0, colon);
-      const val = line.slice(colon+1).trim();
-      if (key === "SUMMARY" || key.startsWith("SUMMARY;")) cur.title = val;
-      if (key === "DTSTART" || key.startsWith("DTSTART;")) {
-        cur.date = val.slice(0,4) + "-" + val.slice(4,6) + "-" + val.slice(6,8);
-        cur.time = val.indexOf("T") !== -1 ? val.slice(9,11) + ":" + val.slice(11,13) : "";
+      const k = line.slice(0, colon);
+      const v = line.slice(colon+1).trim();
+      if (k === "SUMMARY" || k.startsWith("SUMMARY;")) cur.title = v;
+      if (k === "DTSTART" || k.startsWith("DTSTART;")) {
+        cur.date = v.slice(0,4) + "-" + v.slice(4,6) + "-" + v.slice(6,8);
+        cur.time = v.indexOf("T") !== -1 ? v.slice(9,11) + ":" + v.slice(11,13) : "";
         cur.id = "e_" + Math.random().toString(36).slice(2);
+      }
+      if (k === "DTEND" || k.startsWith("DTEND;")) {
+        cur.endDate = v.slice(0,4) + "-" + v.slice(4,6) + "-" + v.slice(6,8);
+      }
+    }
+    // Expand multi-day events
+    const events = [];
+    for (const ev of rawEvents) {
+      if (ev.endDate && ev.endDate > ev.date && ev.time === "") {
+        // All-day multi-day: fill each day from start to end (DTEND is exclusive)
+        let d = new Date(ev.date + "T12:00:00");
+        const end = new Date(ev.endDate + "T12:00:00");
+        while (d < end) {
+          events.push({ ...ev, date: fmtDate(d), id: ev.id + "_" + fmtDate(d) });
+          d.setDate(d.getDate() + 1);
+        }
+      } else {
+        events.push(ev);
       }
     }
     return events;
