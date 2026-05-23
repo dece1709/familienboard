@@ -371,8 +371,9 @@
     bringAction("add", newItem);
     renderShop();
   }
-  function toggleShopItem(id) {
-    const item = shoppingItems.find(i => i.id === id);
+  function toggleShopItem(idx) {
+    const sorted = [...shoppingItems.filter(i => !i.done), ...shoppingItems.filter(i => i.done)];
+    const item = sorted[idx];
     if (!item) return;
     if (!item.done) {
       bringAction("complete", item);
@@ -381,12 +382,15 @@
     }
     item.done = !item.done;
     renderShop();
-    setTimeout(loadShopping, 1000);
+    setTimeout(loadShopping, 2000);
   }
-  function deleteShopItem(id) {
-    const item = shoppingItems.find(i => i.id === id);
-    if (item) bringAction("remove", item);
-    shoppingItems = shoppingItems.filter(i => i.id !== id);
+  function deleteShopItem(idx) {
+    const sorted = [...shoppingItems.filter(i => !i.done), ...shoppingItems.filter(i => i.done)];
+    const item = sorted[idx];
+    if (item) {
+      bringAction("remove", item);
+      shoppingItems = shoppingItems.filter(i => i !== item);
+    }
     renderShop();
   }
   function clearDoneItems() {
@@ -402,12 +406,12 @@
     stats.textContent = open + " offen" + (done > 0 ? " · " + done + " erledigt" : "");
     if (shoppingItems.length === 0) { list.innerHTML = '<div class="shop-empty">Liste ist leer 🎉</div>'; return; }
     const sorted = [...shoppingItems.filter(i => !i.done), ...shoppingItems.filter(i => i.done)];
-    list.innerHTML = sorted.map(item =>
+    list.innerHTML = sorted.map((item, idx) =>
       '<div class="shop-item' + (item.done ? " done" : "") + '">' +
-      '<button class="shop-check' + (item.done ? " checked" : "") + '" onclick="toggleShopItem(' + item.id + ')">' + (item.done ? "✓" : "") + '</button>' +
+      '<button class="shop-check' + (item.done ? " checked" : "") + '" onclick="toggleShopItem(' + idx + ')">' + (item.done ? "✓" : "") + '</button>' +
       '<span class="shop-text' + (item.done ? " done-text" : "") + '">' + escHtml(item.text) + '</span>' +
       (item.qty ? '<span class="shop-qty">' + escHtml(item.qty) + '</span>' : '') +
-      '<button class="shop-del" onclick="deleteShopItem(' + item.id + ')">×</button>' +
+      '<button class="shop-del" onclick="deleteShopItem(' + idx + ')">×</button>' +
       '</div>'
     ).join("");
   }
