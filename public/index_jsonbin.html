@@ -1,1 +1,705 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.json" />
+  <title>Familienboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { background: #F7F4EF; font-family: 'DM Sans', sans-serif; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; user-select: none; min-height: 100dvh; }
+    button { touch-action: manipulation; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+    input { font-family: 'DM Sans', sans-serif; user-select: text; -webkit-user-select: text; }
+    @keyframes blink { 50% { opacity: 0.2; } }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #E8E4DC; border-radius: 4px; }
 
+    #app { display: flex; flex-direction: column; max-width: 1400px; margin: 0 auto; height: 100dvh; overflow: hidden; }
+
+    /* Header */
+    #header { padding: 10px 16px 10px 20px; border-bottom: 1px solid #E8E4DC; background: #F7F4EF; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+    .logo { font-family: 'Playfair Display', serif; font-size: 22px; color: #1A1A2E; font-weight: 700; white-space: nowrap; }
+    .logo span { color: #2D6A4F; }
+    .sync-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; flex: 1; }
+    .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #8A8A9A; flex-shrink: 0; }
+    .sync-dot.ok { background: #2D6A4F; }
+    .sync-dot.error { background: #E07A5F; }
+    .sync-label { font-size: 11px; color: #8A8A9A; }
+    .refresh-btn { background: none; border: none; color: #8A8A9A; font-size: 14px; padding: 0 3px; }
+    #clock { text-align: right; flex-shrink: 0; }
+    #clock-time { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #1A1A2E; line-height: 1; }
+    #clock-time .colon { animation: blink 1s step-end infinite; }
+    #clock-date { font-size: 11px; color: #8A8A9A; margin-top: 1px; }
+    .settings-btn { background: none; border: 1.5px solid #E8E4DC; border-radius: 10px; width: 36px; height: 36px; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    /* Main layout */
+    #main { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+
+    /* Calendar panel */
+    #cal-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+    #cal-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 12px 0px 18px; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+
+    /* Tab bar - inside cal panel */
+    #tabbar { display: flex; gap: 12px; padding: 8px 18px 10px; justify-content: center; flex-shrink: 0; border-top: 1px solid #E8E4DC; background: #F7F4EF; }
+    .tab-btn { min-height: 48px; border: 2px solid #E8E4DC; border-radius: 14px; font-size: 16px; font-weight: 700; color: #8A8A9A; background: #fff; padding: 0 36px; }
+    .tab-btn.active { background: #2D6A4F; color: #fff; }
+
+    /* Weather strip - full width, fixed at bottom */
+    #bottom-bar { flex-shrink: 0; border-top: 1px solid #E8E4DC; background: #F7F4EF; }
+    #weather-strip { padding: 7px 18px 8px; border-top: 1px solid #E8E4DC; background: #F7F4EF; display: flex; gap: 10px; align-items: stretch; flex-shrink: 0; }
+    .wx-now { background: #fff; border: 1.5px solid #E8E4DC; border-radius: 10px; padding: 7px 12px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; min-width: 180px; }
+    .wx-icon { font-size: 30px; line-height: 1; }
+    .wx-temp-big { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #1A1A2E; line-height: 1; }
+    .wx-desc { font-size: 11px; color: #1A1A2E; font-weight: 600; margin-top: 1px; }
+    .wx-temp-range { font-size: 10px; color: #8A8A9A; margin-top: 2px; }
+    .wx-details { font-size: 10px; color: #8A8A9A; margin-top: 2px; display: flex; gap: 8px; }
+    .wx-forecast { flex: 1; display: flex; gap: 5px; }
+    .wx-day { flex: 1; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 8px; padding: 5px 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+    .wx-day-name { font-size: 9px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.4px; }
+    .wx-day-icon { font-size: 18px; line-height: 1; }
+    .wx-day-max { font-size: 13px; font-weight: 700; color: #1A1A2E; }
+    .wx-day-min { font-size: 10px; color: #8A8A9A; }
+    .wx-day-rain { font-size: 9px; color: #1A73E8; font-weight: 600; }
+    .wx-loading { color: #8A8A9A; font-size: 12px; padding: 8px; }
+
+    /* Two-week grid */
+    .week-block { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
+    .week-label { font-size: 11px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.6px; padding-left: 2px; }
+    .week-label.current { color: #2D6A4F; }
+    .day-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
+    .day-col { background: #fff; border: 1.5px solid #E8E4DC; border-radius: 12px; padding: 8px 5px; display: flex; flex-direction: column; gap: 4px; height: 175px; overflow: hidden; }
+    .day-col.today { background: #2D6A4F0D; border-color: #2D6A4F; border-width: 2px; }
+    .day-header { text-align: center; margin-bottom: 2px; }
+    .day-name { font-size: 9px; color: #8A8A9A; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    .day-num { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #1A1A2E; width: 28px; margin: 1px auto 0; line-height: 28px; border-radius: 7px; text-align: center; }
+    .day-col.today .day-num { background: #2D6A4F; color: #fff; }
+    .day-col.today .day-name { color: #2D6A4F; }
+    .event-chip { border-radius: 4px; padding: 2px 4px; font-size: 10px; color: #1A1A2E; word-break: break-word; line-height: 1.3; }
+    .event-time { font-weight: 700; font-size: 9px; display: block; }
+    .more-badge { font-size: 9px; font-weight: 700; color: #8A8A9A; background: #F0EDE8; border-radius: 4px; padding: 1px 4px; text-align: center; }
+    .day-full-date { font-size: 9px; color: #8A8A9A; text-align: center; margin-top: 1px; }
+    .day-col.today .day-full-date { color: #2D6A4F; }
+    .current-week { scroll-margin-top: 8px; }
+
+    /* Upcoming */
+    .upcoming-list { display: flex; flex-direction: column; gap: 7px; }
+    .upcoming-item { display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 12px; padding: 10px 14px; }
+    .upcoming-item.highlight { background: #1A73E810; border-color: #1A73E844; }
+    .upcoming-date { min-width: 66px; text-align: center; flex-shrink: 0; }
+    .upcoming-date-label { font-size: 12px; font-weight: 700; }
+    .upcoming-time-label { font-size: 11px; color: #8A8A9A; }
+    .upcoming-divider { width: 2px; height: 30px; border-radius: 2px; flex-shrink: 0; }
+    .upcoming-title { flex: 1; font-size: 14px; color: #1A1A2E; }
+    .upcoming-title.bold { font-weight: 600; }
+    .badge { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; }
+    .badge-green { color: #2D6A4F; background: #2D6A4F18; }
+    .badge-blue { color: #1A73E8; background: #1A73E818; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #1A1A2E; margin-bottom: 10px; }
+    .no-events { color: #8A8A9A; text-align: center; padding: 32px; font-size: 14px; }
+
+    /* Shopping panel */
+    #shop-panel { width: 270px; flex-shrink: 0; border-left: 1px solid #E8E4DC; display: flex; flex-direction: column; background: #FAFAF8; overflow: hidden; min-height: 0; padding-bottom: 80px; }
+    .shop-header { padding: 10px 12px 8px; border-bottom: 1px solid #E8E4DC; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .shop-title { font-family: 'Playfair Display', serif; font-size: 15px; color: #1A1A2E; font-weight: 700; }
+    .shop-stats { font-size: 10px; color: #8A8A9A; margin-top: 1px; }
+    .shop-list { flex: 1; overflow-y: auto; padding: 6px 9px; display: flex; flex-direction: column; gap: 4px; min-height: 0; }
+    .shop-item { display: flex; align-items: center; gap: 7px; background: #fff; border: 1.5px solid #E8E4DC; border-radius: 9px; padding: 7px 8px; min-height: 38px; }
+    .shop-item.done { opacity: 0.4; }
+    .shop-check { width: 24px; height: 24px; border-radius: 6px; border: 2px solid #E07A5F; background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #fff; }
+    .shop-check.checked { background: #E07A5F; border-color: #E07A5F; }
+    .shop-text { flex: 1; font-size: 13px; color: #1A1A2E; line-height: 1.3; }
+    .shop-text.done-text { text-decoration: line-through; }
+    .shop-qty { font-size: 11px; color: #8A8A9A; font-weight: 600; background: #F7F4EF; border-radius: 5px; padding: 1px 6px; flex-shrink: 0; }
+    .shop-del { background: none; border: none; color: #D0D0D0; font-size: 17px; padding: 0 2px; flex-shrink: 0; }
+    .shop-add { padding: 7px 9px; border-top: 1px solid #E8E4DC; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; margin-top: auto; }
+    .shop-add input { border: 1.5px solid #E8E4DC; border-radius: 9px; padding: 8px 10px; font-size: 11px; background: #fff; color: #1A1A2E; outline: none; width: 100%; }
+    .shop-add input:focus { outline: 2px solid #E07A5F33; }
+    .shop-add-row { display: flex; gap: 5px; }
+    .shop-qty-input { width: 58px !important; flex: none !important; }
+    .btn-add-shop { background: #E07A5F; color: #fff; border: none; border-radius: 9px; padding: 8px 10px; font-size: 12px; font-weight: 700; flex: 1; }
+    .shop-clear-btn { background: none; border: none; color: #B0B0B0; font-size: 10px; padding: 2px 0; text-align: center; width: 100%; }
+    .shop-empty { color: #8A8A9A; text-align: center; padding: 16px 10px; font-size: 12px; }
+
+    /* Day popup */
+    .day-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 50; }
+    .day-popup { background: #fff; border-radius: 16px; padding: 20px; width: min(340px, 88vw); box-shadow: 0 12px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; max-height: 80vh; overflow-y: auto; }
+    .day-popup h3 { font-family: 'Playfair Display', serif; font-size: 18px; color: #1A1A2E; }
+    .popup-event { background: #FAFAF8; border-radius: 8px; padding: 8px 10px; border-left: 3px solid #ccc; }
+    .popup-event-time { font-size: 11px; font-weight: 700; display: block; margin-bottom: 2px; }
+    .popup-event-title { font-size: 14px; color: #1A1A2E; }
+    .popup-close { background: #F7F4EF; border: none; border-radius: 9px; padding: 9px; font-size: 13px; font-weight: 700; color: #8A8A9A; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .modal { background: #fff; border-radius: 20px; padding: 24px; width: min(560px, 92vw); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+    .modal h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; }
+    .modal label { font-size: 12px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
+    .modal input { width: 100%; border: 1.5px solid #E8E4DC; border-radius: 11px; padding: 11px 13px; font-size: 14px; background: #FAFAF8; color: #1A1A2E; outline: none; }
+    .modal input:focus { outline: 2px solid #2D6A4F44; }
+    .modal-hint { font-size: 11px; color: #8A8A9A; margin-top: 3px; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .modal-actions .btn-primary { flex: 1; }
+    .btn-primary { background: #2D6A4F; color: #fff; border: none; border-radius: 11px; padding: 11px 18px; font-size: 14px; font-weight: 700; }
+    .btn-ghost { background: #F7F4EF; color: #1A1A2E; border: 1.5px solid #E8E4DC; border-radius: 11px; padding: 11px 18px; font-size: 14px; }
+    .btn-danger { background: none; border: 1.5px solid #E07A5F; color: #E07A5F; border-radius: 9px; padding: 5px 11px; font-size: 12px; }
+    .cal-list { display: flex; flex-direction: column; gap: 8px; }
+    .cal-item { display: flex; align-items: center; gap: 10px; background: #FAFAF8; border: 1.5px solid #E8E4DC; border-radius: 11px; padding: 9px 11px; }
+    .cal-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .cal-name { flex: 1; font-size: 13px; color: #1A1A2E; font-weight: 600; }
+    .cal-status { font-size: 10px; color: #8A8A9A; }
+    .status-ok { font-size: 12px; color: #2D6A4F; }
+    .status-error { font-size: 12px; color: #E07A5F; }
+    .status-loading { font-size: 12px; color: #8A8A9A; }
+    .divider { border: none; border-top: 1px solid #E8E4DC; margin: 2px 0; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div style="flex-shrink:0">
+      <div class="logo">Familien<span>board</span></div>
+    </div>
+    <div class="sync-row" id="sync-row"></div>
+    <div id="clock">
+      <div id="clock-time"><span id="ch">00</span><span class="colon">:</span><span id="cm">00</span></div>
+      <div id="clock-date"></div>
+    </div>
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+  </div>
+
+  <div id="main">
+    <div id="cal-panel">
+      <div id="cal-scroll"></div>
+      <div id="tabbar">
+        <button class="tab-btn active" id="tab-week" onclick="setTab('week')">📅 Woche</button>
+        <button class="tab-btn" id="tab-upcoming" onclick="setTab('upcoming')">🗓 Demnächst</button>
+      </div>
+    </div>
+    <div id="shop-panel">
+      <div class="shop-header">
+        <div>
+          <div class="shop-title">🛒 Einkaufen</div>
+          <div class="shop-stats" id="shop-stats"></div>
+        </div>
+        <button class="refresh-btn" onclick="loadShopping()">↻</button>
+      </div>
+      <div class="shop-list" id="shop-list"></div>
+      <div class="shop-add">
+        <input type="text" id="shop-input" placeholder="Was kaufen?" onkeydown="if(event.key==='Enter')addShopItem()" />
+        <div class="shop-add-row">
+          <input type="text" id="shop-qty" placeholder="Menge" class="shop-qty-input" onkeydown="if(event.key==='Enter')addShopItem()" />
+          <button class="btn-add-shop" onclick="addShopItem()">+ Hinzufügen</button>
+        </div>
+        <button class="shop-clear-btn" onclick="clearDoneItems()">Erledigte löschen</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="weather-strip"><span class="wx-loading">⏳ Wetter wird geladen…</span></div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettingsOverlay(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2>Einstellungen</h2>
+    <div>
+      <label>Kalender</label>
+      <div class="cal-list" id="cal-list"></div>
+    </div>
+    <hr class="divider" />
+    <div>
+      <label>Neuen Kalender hinzufügen</label>
+      <input type="text" id="new-cal-name" placeholder="Name (z.B. Familie, Geburtstage)" style="margin-bottom:7px" />
+      <input type="url" id="new-cal-url" placeholder="https://calendar.google.com/calendar/ical/…" />
+      <p class="modal-hint">Google Kalender → ⋮ → Einstellungen → „Öffentliche URL im iCal-Format"</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="addCalendar()">Hinzufügen & laden</button>
+      <button class="btn-ghost" onclick="document.getElementById('settings-modal').style.display='none'">Schließen</button>
+    </div>
+    <div id="settings-status"></div>
+  </div>
+</div>
+
+<!-- Day popup -->
+<div class="day-popup-overlay" id="day-popup" style="display:none" onclick="closeDayPopup(event)">
+  <div class="day-popup" onclick="event.stopPropagation()">
+    <h3 id="popup-title"></h3>
+    <div id="popup-events"></div>
+    <button class="popup-close" onclick="document.getElementById('day-popup').style.display='none'">Schließen</button>
+  </div>
+</div>
+
+<script>
+  const DAYS_SHORT = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+  const DAYS_LONG = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+  const DAYS_SHORT_WX = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+  const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+  const MONTHS_SHORT = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+  const CAL_COLORS = ["#1A73E8","#2D6A4F","#C77DFF","#E07A5F","#F4A261","#2A9D8F","#E76F51"];
+  const MAX_EV = 3;
+
+  let currentTab = "week";
+  let calendars = [];
+  let shoppingItems = [];
+
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+  function saveCals() { lsSet("calendars_v2", calendars.map(c => ({ id: c.id, name: c.name, url: c.url, color: c.color }))); }
+  function loadCals() {
+    const old = lsGet("cal_ics");
+    const saved = lsGet("calendars_v2");
+    if (saved && saved.length > 0) {
+      calendars = saved.map(c => ({ ...c, events: [], status: "", lastSync: null }));
+    } else if (old) {
+      calendars = [{ id: "cal_0", name: "Familienkalender", url: old, color: CAL_COLORS[0], events: [], status: "", lastSync: null }];
+      saveCals();
+    }
+  }
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById("ch").textContent = String(now.getHours()).padStart(2,"0");
+    document.getElementById("cm").textContent = String(now.getMinutes()).padStart(2,"0");
+    const di = now.getDay() === 0 ? 6 : now.getDay() - 1;
+    document.getElementById("clock-date").textContent = DAYS_LONG[di] + ", " + now.getDate() + ". " + MONTHS[now.getMonth()] + " " + now.getFullYear();
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  function fmtDate(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+  function isToday(d) { return fmtDate(d) === fmtDate(new Date()); }
+  function isTomorrow(d) { const t = new Date(); t.setDate(t.getDate()+1); return fmtDate(d) === fmtDate(t); }
+  function getWeekDates(offset) {
+    const now = new Date();
+    const day = now.getDay();
+    const diff = (day === 0 ? -6 : 1 - day) + offset * 7;
+    return Array.from({length:7}, (_,i) => { const d = new Date(now); d.setDate(now.getDate()+diff+i); return d; });
+  }
+
+  function parseIcs(text) {
+    const rawEvents = [];
+    const lines = text.split("\n");
+    const unfolded = [];
+    for (const line of lines) {
+      const trimmed = line.replace(/\r$/, "");
+      if ((trimmed.startsWith(" ") || trimmed.startsWith("\t")) && unfolded.length > 0) {
+        unfolded[unfolded.length-1] += trimmed.slice(1);
+      } else { unfolded.push(trimmed); }
+    }
+    let cur = null;
+    for (const line of unfolded) {
+      if (line === "BEGIN:VEVENT") { cur = {}; continue; }
+      if (line === "END:VEVENT" && cur) { if (cur.date && cur.title) rawEvents.push(cur); cur = null; continue; }
+      if (!cur) continue;
+      const colon = line.indexOf(":");
+      if (colon === -1) continue;
+      const k = line.slice(0, colon);
+      const v = line.slice(colon+1).trim();
+      if (k === "SUMMARY" || k.startsWith("SUMMARY;")) cur.title = v;
+      if (k === "DTSTART" || k.startsWith("DTSTART;")) {
+        cur.date = v.slice(0,4) + "-" + v.slice(4,6) + "-" + v.slice(6,8);
+        cur.time = v.indexOf("T") !== -1 ? v.slice(9,11) + ":" + v.slice(11,13) : "";
+        cur.id = "e_" + Math.random().toString(36).slice(2);
+      }
+      if (k === "DTEND" || k.startsWith("DTEND;")) {
+        cur.endDate = v.slice(0,4) + "-" + v.slice(4,6) + "-" + v.slice(6,8);
+      }
+    }
+    // Expand multi-day events
+    const events = [];
+    for (const ev of rawEvents) {
+      if (ev.endDate && ev.endDate > ev.date && ev.time === "") {
+        // All-day multi-day: fill each day from start to end (DTEND is exclusive)
+        let d = new Date(ev.date + "T12:00:00");
+        const end = new Date(ev.endDate + "T12:00:00");
+        while (d < end) {
+          events.push({ ...ev, date: fmtDate(d), id: ev.id + "_" + fmtDate(d) });
+          d.setDate(d.getDate() + 1);
+        }
+      } else {
+        events.push(ev);
+      }
+    }
+    return events;
+  }
+
+  async function fetchCal(cal) {
+    cal.status = "loading"; updateSyncRow();
+    try {
+      const httpUrl = cal.url.replace(/^webcal:\/\//i, "https://");
+      const res = await fetch("/api/ics?url=" + encodeURIComponent(httpUrl));
+      if (!res.ok) throw new Error();
+      cal.events = parseIcs(await res.text());
+      cal.status = "ok"; cal.lastSync = new Date();
+    } catch { cal.status = "error"; }
+    updateSyncRow(); renderCal();
+  }
+  function fetchAllCals() { calendars.forEach(fetchCal); }
+  setInterval(fetchAllCals, 5 * 60 * 1000);
+
+  async function loadShopping() {
+    try {
+      const res = await fetch("/api/shopping");
+      if (!res.ok) throw new Error();
+      shoppingItems = await res.json();
+    } catch { shoppingItems = lsGet("shopping_local") || []; }
+    renderShop();
+  }
+  async function saveShopping() {
+    lsSet("shopping_local", shoppingItems);
+    try {
+      await fetch("/api/shopping", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: shoppingItems }) });
+    } catch {}
+  }
+  function addShopItem() {
+    const inp = document.getElementById("shop-input");
+    const qty = document.getElementById("shop-qty");
+    const text = inp.value.trim();
+    if (!text) return;
+    shoppingItems.push({ id: Date.now(), text, qty: qty.value.trim(), done: false });
+    inp.value = ""; qty.value = "";
+    saveShopping(); renderShop();
+  }
+  function toggleShopItem(id) {
+    const item = shoppingItems.find(i => i.id === id);
+    if (item) { item.done = !item.done; saveShopping(); renderShop(); }
+  }
+  function deleteShopItem(id) { shoppingItems = shoppingItems.filter(i => i.id !== id); saveShopping(); renderShop(); }
+  function clearDoneItems() { shoppingItems = shoppingItems.filter(i => !i.done); saveShopping(); renderShop(); }
+  function renderShop() {
+    const list = document.getElementById("shop-list");
+    const stats = document.getElementById("shop-stats");
+    const open = shoppingItems.filter(i => !i.done).length;
+    const done = shoppingItems.filter(i => i.done).length;
+    stats.textContent = open + " offen" + (done > 0 ? " · " + done + " erledigt" : "");
+    if (shoppingItems.length === 0) { list.innerHTML = '<div class="shop-empty">Liste ist leer 🎉</div>'; return; }
+    const sorted = [...shoppingItems.filter(i => !i.done), ...shoppingItems.filter(i => i.done)];
+    list.innerHTML = sorted.map(item =>
+      '<div class="shop-item' + (item.done ? " done" : "") + '">' +
+      '<button class="shop-check' + (item.done ? " checked" : "") + '" onclick="toggleShopItem(' + item.id + ')">' + (item.done ? "✓" : "") + '</button>' +
+      '<span class="shop-text' + (item.done ? " done-text" : "") + '">' + escHtml(item.text) + '</span>' +
+      (item.qty ? '<span class="shop-qty">' + escHtml(item.qty) + '</span>' : '') +
+      '<button class="shop-del" onclick="deleteShopItem(' + item.id + ')">×</button>' +
+      '</div>'
+    ).join("");
+  }
+  setInterval(loadShopping, 30 * 1000);
+
+  function updateSyncRow() {
+    const row = document.getElementById("sync-row");
+    if (calendars.length === 0) { row.innerHTML = '<div class="sync-dot"></div><span class="sync-label">Kein Kalender</span>'; return; }
+    let html = "";
+    for (const cal of calendars) {
+      const dotColor = cal.status === "ok" ? cal.color : cal.status === "error" ? "#E07A5F" : "#8A8A9A";
+      const label = cal.status === "ok" && cal.lastSync
+        ? cal.name + " " + String(cal.lastSync.getHours()).padStart(2,"0") + ":" + String(cal.lastSync.getMinutes()).padStart(2,"0")
+        : cal.status === "loading" ? cal.name + " lädt…"
+        : cal.status === "error" ? cal.name + " ⚠️" : cal.name;
+      html += '<div class="sync-dot" style="background:' + dotColor + '"></div><span class="sync-label">' + label + '</span>';
+    }
+    html += '<button class="refresh-btn" onclick="fetchAllCals()">↻</button>';
+    row.innerHTML = html;
+  }
+
+  function allEvents() {
+    const result = [];
+    for (const cal of calendars) for (const ev of cal.events) result.push({ ...ev, calColor: cal.color, calName: cal.name });
+    return result;
+  }
+
+  function showDayPopup(dateKey, dayLabel) {
+    const events = allEvents().filter(e => e.date === dateKey).sort((a,b) => (a.time||"").localeCompare(b.time||""));
+    document.getElementById("popup-title").textContent = dayLabel;
+    document.getElementById("popup-events").innerHTML = events.map(ev =>
+      '<div class="popup-event" style="border-left-color:' + ev.calColor + '">' +
+      (ev.time ? '<span class="popup-event-time" style="color:' + ev.calColor + '">' + ev.time + '</span>' : '') +
+      '<span class="popup-event-title">' + escHtml(ev.title) + '</span>' +
+      '</div>'
+    ).join("");
+    document.getElementById("day-popup").style.display = "flex";
+  }
+  function closeDayPopup(e) { if (e.target === document.getElementById("day-popup")) document.getElementById("day-popup").style.display = "none"; }
+
+  // Infinite scroll state
+  let calStartOffset = -4;
+  let calEndOffset = 52;
+  let infiniteObserver = null;
+
+  function getISOWeek(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  }
+
+  function renderWeekBlock(offset) {
+    const weekDates = getWeekDates(offset);
+    const events = allEvents();
+    const thisWeekStart = fmtDate(getWeekDates(0)[0]);
+    const blockStart = fmtDate(weekDates[0]);
+    const isCurrent = blockStart === thisWeekStart;
+    let labelText;
+    if (offset === 0) labelText = "Diese Woche";
+    else if (offset === 1) labelText = "Nächste Woche";
+    else if (offset === -1) labelText = "Letzte Woche";
+    else {
+      const mon = weekDates[0]; const sun = weekDates[6];
+      labelText = "KW " + getISOWeek(mon) + " · " + mon.getDate() + "." + (mon.getMonth()+1) + " – " + sun.getDate() + "." + (sun.getMonth()+1) + "." + sun.getFullYear();
+    }
+    let html = '<div class="week-block' + (isCurrent ? " current-week" : "") + '" data-offset="' + offset + '">';
+    html += '<div class="week-label' + (isCurrent ? " current" : "") + '">' + labelText + '</div>';
+    html += '<div class="day-grid">';
+    for (let i = 0; i < 7; i++) {
+      const d = weekDates[i];
+      const key = fmtDate(d);
+      const today = isToday(d);
+      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const yyyy = d.getFullYear();
+      const dayLabel = DAYS_LONG[i] + ", " + d.getDate() + ". " + MONTHS[d.getMonth()];
+      const dayEvs = events.filter(e => e.date === key).sort((a,b) => (a.time||"").localeCompare(b.time||""));
+      const shown = dayEvs.slice(0, MAX_EV);
+      const hidden = dayEvs.length - shown.length;
+      html += '<div class="day-col' + (today ? " today" : "") + '" onclick="showDayPopup(\'' + key + '\',\'' + dayLabel + '\')">';
+      html += '<div class="day-header">';
+      html += '<div class="day-name">' + DAYS_SHORT[i] + '</div>';
+      html += '<div class="day-num">' + d.getDate() + '</div>';
+      html += '<div class="day-full-date">' + dd + '.' + mm + '.' + yyyy + '</div>';
+      html += '</div>';
+      for (const ev of shown) {
+        html += '<div class="event-chip" style="background:' + ev.calColor + '15;border-left:3px solid ' + ev.calColor + '">';
+        if (ev.time) html += '<span class="event-time" style="color:' + ev.calColor + '">' + ev.time + '</span>';
+        html += escHtml(ev.title) + '</div>';
+      }
+      if (hidden > 0) html += '<div class="more-badge">+' + hidden + ' weitere</div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function setTab(tab) {
+    currentTab = tab;
+    document.getElementById("tab-week").className = "tab-btn" + (tab === "week" ? " active" : "");
+    document.getElementById("tab-upcoming").className = "tab-btn" + (tab === "upcoming" ? " active" : "");
+    document.getElementById("shop-panel").style.display = tab === "week" ? "flex" : "none";
+    if (tab === "week") { calStartOffset = -4; calEndOffset = 52; }
+    renderCal();
+    if (tab === "week") setTimeout(scrollToCurrentWeek, 80);
+  }
+
+  function scrollToCurrentWeek() {
+    const el = document.querySelector(".current-week");
+    if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
+  }
+
+  function renderCal() {
+    const panel = document.getElementById("cal-scroll");
+    if (infiniteObserver) { infiniteObserver.disconnect(); infiniteObserver = null; }
+    let html = "";
+    if (currentTab === "week") {
+      html += '<div id="cal-top-sentinel" style="height:1px"></div>';
+      for (let i = calStartOffset; i <= calEndOffset; i++) html += renderWeekBlock(i);
+      html += '<div id="cal-bottom-sentinel" style="height:1px"></div>';
+      panel.innerHTML = html;
+      setupInfiniteScroll(panel);
+    }
+    if (currentTab === "upcoming") {
+      const today = fmtDate(new Date());
+      // Deduplicate multi-day events
+      const allEv = allEvents().filter(e => e.date >= today);
+      const seen = new Map();
+      for (const ev of allEv) {
+        const baseId = ev.id.replace(/_\d{4}-\d{2}-\d{2}$/, "");
+        if (!seen.has(baseId)) {
+          seen.set(baseId, { ...ev, endDate: ev.date });
+        } else {
+          const ex = seen.get(baseId);
+          if (ev.date > ex.endDate) ex.endDate = ev.date;
+        }
+      }
+      const upcoming = Array.from(seen.values())
+        .sort((a,b) => a.date.localeCompare(b.date) || (a.time||"").localeCompare(b.time||""))
+        .slice(0, 50);
+      html += '<div class="section-title">Bevorstehende Termine</div>';
+      if (upcoming.length === 0) {
+        html += '<div class="no-events">Keine bevorstehenden Termine</div>';
+      } else {
+        html += '<div class="upcoming-list">';
+        for (const ev of upcoming) {
+          const d = new Date(ev.date + "T12:00:00");
+          const di = d.getDay() === 0 ? 6 : d.getDay() - 1;
+          const isMulti = ev.endDate && ev.endDate > ev.date;
+          let dateStr;
+          if (isMulti) {
+            const ds = ev.date.slice(8,10) + "." + ev.date.slice(5,7) + ".";
+            const de = ev.endDate.slice(8,10) + "." + ev.endDate.slice(5,7) + "." + ev.endDate.slice(0,4);
+            dateStr = ds + "–" + de;
+          } else {
+            dateStr = DAYS_SHORT[di] + " " + d.getDate() + ". " + MONTHS_SHORT[d.getMonth()];
+          }
+          const hl = ev.date === today || isTomorrow(d);
+          const badge = ev.date === today ? '<span class="badge badge-green">Heute</span>' : isTomorrow(d) ? '<span class="badge badge-blue">Morgen</span>' : "";
+          html += '<div class="upcoming-item' + (hl ? " highlight" : "") + '">';
+          html += '<div class="upcoming-date"><div class="upcoming-date-label" style="color:' + ev.calColor + ';font-size:11px">' + dateStr + '</div>';
+          if (ev.time) html += '<div class="upcoming-time-label">' + ev.time + '</div>';
+          html += '</div><div class="upcoming-divider" style="background:' + ev.calColor + '44"></div>';
+          html += '<div class="upcoming-title' + (hl ? " bold" : "") + '">' + escHtml(ev.title) + '</div>' + badge + '</div>';
+        }
+        html += '</div>';
+      }
+      panel.innerHTML = html;
+    }
+  }
+
+  function setupInfiniteScroll(panel) {
+    infiniteObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        if (entry.target.id === "cal-bottom-sentinel") {
+          calEndOffset += 8;
+          const sentinel = document.getElementById("cal-bottom-sentinel");
+          for (let i = calEndOffset - 7; i <= calEndOffset; i++) {
+            const tmp = document.createElement("div");
+            tmp.innerHTML = renderWeekBlock(i);
+            panel.insertBefore(tmp.firstChild, sentinel);
+          }
+        }
+        if (entry.target.id === "cal-top-sentinel") {
+          const prevStart = calStartOffset;
+          calStartOffset -= 8;
+          const sentinel = document.getElementById("cal-top-sentinel");
+          const scrollBefore = panel.scrollHeight;
+          const scrollTopBefore = panel.scrollTop;
+          for (let i = prevStart - 1; i >= calStartOffset; i--) {
+            const tmp = document.createElement("div");
+            tmp.innerHTML = renderWeekBlock(i);
+            sentinel.after(tmp.firstChild);
+          }
+          panel.scrollTop = scrollTopBefore + (panel.scrollHeight - scrollBefore);
+        }
+      });
+    }, { root: panel, threshold: 0.1 });
+    const top = document.getElementById("cal-top-sentinel");
+    const bot = document.getElementById("cal-bottom-sentinel");
+    if (top) infiniteObserver.observe(top);
+    if (bot) infiniteObserver.observe(bot);
+  }
+
+  function escHtml(s) { return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function openSettings() {
+    renderCalList();
+    document.getElementById("settings-status").innerHTML = "";
+    document.getElementById("new-cal-name").value = "";
+    document.getElementById("new-cal-url").value = "";
+    document.getElementById("settings-modal").style.display = "flex";
+  }
+  function closeSettingsOverlay(e) { if (e.target === document.getElementById("settings-modal")) document.getElementById("settings-modal").style.display = "none"; }
+  function renderCalList() {
+    const list = document.getElementById("cal-list");
+    if (calendars.length === 0) { list.innerHTML = '<p style="font-size:12px;color:#8A8A9A">Noch keine Kalender.</p>'; return; }
+    list.innerHTML = calendars.map((cal, i) =>
+      '<div class="cal-item">' +
+      '<div class="cal-dot" style="background:' + cal.color + '"></div>' +
+      '<div style="flex:1"><div class="cal-name">' + escHtml(cal.name) + '</div>' +
+      '<div class="cal-status">' + (cal.status === "ok" ? "✓ " + cal.events.length + " Termine" : cal.status === "error" ? "⚠️ Fehler" : cal.status === "loading" ? "⏳ Lädt…" : "Nicht geladen") + '</div></div>' +
+      '<button class="btn-danger" onclick="removeCal(' + i + ')">Entfernen</button></div>'
+    ).join("");
+  }
+  async function addCalendar() {
+    const name = document.getElementById("new-cal-name").value.trim();
+    const url = document.getElementById("new-cal-url").value.trim();
+    if (!name || !url) { document.getElementById("settings-status").innerHTML = '<p class="status-error">Bitte Name und URL eingeben.</p>'; return; }
+    const color = CAL_COLORS[calendars.length % CAL_COLORS.length];
+    const cal = { id: "cal_" + Date.now(), name, url, color, events: [], status: "", lastSync: null };
+    calendars.push(cal); saveCals();
+    document.getElementById("settings-status").innerHTML = '<p class="status-loading">⏳ Wird geladen…</p>';
+    renderCalList();
+    await fetchCal(cal);
+    document.getElementById("settings-status").innerHTML = cal.status === "ok"
+      ? '<p class="status-ok">✓ ' + cal.events.length + ' Termine geladen</p>'
+      : '<p class="status-error">⚠️ Laden fehlgeschlagen</p>';
+    renderCalList(); renderCal();
+  }
+  function removeCal(i) { calendars.splice(i, 1); saveCals(); renderCalList(); updateSyncRow(); renderCal(); }
+
+  // Weather
+  const WX_LAT = 48.7058, WX_LON = 9.0053;
+  function wxCode(code, isDay) {
+    if (code === 0) return isDay ? "☀️" : "🌙";
+    if (code <= 2) return "⛅";
+    if (code === 3) return "☁️";
+    if (code <= 49) return "🌫️";
+    if (code <= 59) return "🌦️";
+    if (code <= 69) return "🌧️";
+    if (code <= 79) return "🌨️";
+    if (code <= 84) return "🌧️";
+    return "⛈️";
+  }
+  function wxDesc(code) {
+    if (code === 0) return "Klarer Himmel";
+    if (code === 1) return "Überwiegend klar";
+    if (code === 2) return "Teilweise bewölkt";
+    if (code === 3) return "Bedeckt";
+    if (code <= 49) return "Nebel";
+    if (code <= 59) return "Nieselregen";
+    if (code <= 69) return "Regen";
+    if (code <= 79) return "Schnee";
+    if (code <= 84) return "Schauer";
+    return "Gewitter";
+  }
+  async function loadWeather() {
+    try {
+      const url = "https://api.open-meteo.com/v1/forecast?latitude=" + WX_LAT + "&longitude=" + WX_LON +
+        "&current=temperature_2m,weathercode,windspeed_10m,is_day" +
+        "&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
+        "&timezone=Europe%2FBerlin&forecast_days=6";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      const cur = d.current;
+      const daily = d.daily;
+      const isDay = cur.is_day === 1;
+      let html = '<div class="wx-now">';
+      html += '<div class="wx-icon">' + wxCode(cur.weathercode, isDay) + '</div>';
+      html += '<div>';
+      html += '<div class="wx-temp-big">' + Math.round(cur.temperature_2m) + '°</div>';
+      html += '<div class="wx-desc">' + wxDesc(cur.weathercode) + '</div>';
+      html += '<div class="wx-temp-range">↑' + Math.round(daily.temperature_2m_max[0]) + '° ↓' + Math.round(daily.temperature_2m_min[0]) + '°</div>';
+      html += '<div class="wx-details"><span>💧 ' + daily.precipitation_probability_max[0] + '%</span><span>💨 ' + Math.round(cur.windspeed_10m) + ' km/h</span></div>';
+      html += '</div></div>';
+      html += '<div class="wx-forecast">';
+      for (let i = 1; i <= 5; i++) {
+        const date = new Date(daily.time[i] + "T12:00:00");
+        html += '<div class="wx-day">';
+        html += '<div class="wx-day-name">' + DAYS_SHORT_WX[date.getDay()] + '</div>';
+        html += '<div class="wx-day-icon">' + wxCode(daily.weathercode[i], true) + '</div>';
+        html += '<div class="wx-day-max">' + Math.round(daily.temperature_2m_max[i]) + '°</div>';
+        html += '<div class="wx-day-min">' + Math.round(daily.temperature_2m_min[i]) + '°</div>';
+        html += '<div class="wx-day-rain">💧' + daily.precipitation_probability_max[i] + '%</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+      document.getElementById("weather-strip").innerHTML = html;
+    } catch {
+      document.getElementById("weather-strip").innerHTML = '<span class="wx-loading">⚠️ Wetter nicht verfügbar</span>';
+    }
+  }
+  setInterval(loadWeather, 15 * 60 * 1000);
+  loadWeather();
+
+  loadCals(); updateSyncRow(); renderCal(); renderShop();
+  if (calendars.length > 0) fetchAllCals();
+  loadShopping();
+  setTimeout(scrollToCurrentWeek, 150);
+</script>
+</body>
+</html>
