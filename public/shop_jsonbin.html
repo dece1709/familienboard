@@ -1,1 +1,195 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Einkaufsliste</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      background: #F7F4EF; font-family: 'DM Sans', sans-serif;
+      min-height: 100dvh; padding: 0 0 24px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button { touch-action: manipulation; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+    input { font-family: 'DM Sans', sans-serif; }
 
+    #header {
+      background: #F7F4EF; padding: 16px 20px 12px;
+      border-bottom: 1px solid #E8E4DC;
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { font-family: 'Playfair Display', serif; font-size: 22px; color: #1A1A2E; font-weight: 700; }
+    .logo span { color: #E07A5F; }
+    .stats { font-size: 12px; color: #8A8A9A; margin-top: 2px; }
+    .refresh-btn { background: none; border: 1.5px solid #E8E4DC; border-radius: 10px; width: 38px; height: 38px; font-size: 18px; display: flex; align-items: center; justify-content: center; color: #8A8A9A; }
+
+    #list { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+    .item {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border: 1.5px solid #E8E4DC;
+      border-radius: 14px; padding: 12px 14px; min-height: 52px;
+    }
+    .item.done { opacity: 0.4; }
+    .check {
+      width: 30px; height: 30px; border-radius: 8px;
+      border: 2.5px solid #E07A5F; background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 16px; color: #fff;
+    }
+    .check.checked { background: #E07A5F; }
+    .item-text { flex: 1; font-size: 17px; color: #1A1A2E; line-height: 1.3; }
+    .item-text.done-text { text-decoration: line-through; }
+    .item-qty { font-size: 14px; color: #8A8A9A; font-weight: 600; background: #F7F4EF; border-radius: 7px; padding: 2px 9px; flex-shrink: 0; }
+    .item-del { background: none; border: none; color: #D0D0D0; font-size: 22px; padding: 0 2px; flex-shrink: 0; }
+
+    .empty { color: #8A8A9A; text-align: center; padding: 48px 20px; font-size: 16px; }
+
+    .done-section { margin-top: 4px; }
+    .done-toggle { background: none; border: none; color: #8A8A9A; font-size: 13px; padding: 8px 16px; width: 100%; text-align: left; }
+
+    #add-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(247,244,239,0.97);
+      border-top: 1px solid #E8E4DC;
+      padding: 10px 16px 20px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #add-bar input {
+      border: 1.5px solid #E8E4DC; border-radius: 12px;
+      padding: 12px 14px; font-size: 16px; background: #fff;
+      color: #1A1A2E; outline: none; width: 100%;
+    }
+    #add-bar input:focus { outline: 2px solid #E07A5F44; }
+    .add-row { display: flex; gap: 8px; }
+    .qty-input { width: 80px !important; flex: none !important; }
+    .btn-add {
+      background: #E07A5F; color: #fff; border: none;
+      border-radius: 12px; padding: 12px 18px; font-size: 16px; font-weight: 700; flex: 1;
+    }
+    .clear-btn { background: none; border: none; color: #B0B0B0; font-size: 13px; text-align: center; padding: 2px; }
+    body { padding-bottom: 140px; }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <div>
+    <div class="logo">Einkaufs<span>liste</span></div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <button class="refresh-btn" onclick="loadItems()">↻</button>
+</div>
+
+<div id="list"></div>
+
+<div id="add-bar">
+  <input type="text" id="inp" placeholder="Was kaufen?" onkeydown="if(event.key==='Enter')addItem()" />
+  <div class="add-row">
+    <input type="text" id="qty" placeholder="Menge" class="qty-input" onkeydown="if(event.key==='Enter')addItem()" />
+    <button class="btn-add" onclick="addItem()">+ Hinzufügen</button>
+  </div>
+  <button class="clear-btn" onclick="clearDone()">Erledigte löschen</button>
+</div>
+
+<script>
+  let items = [];
+  let showDone = false;
+
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+  async function loadItems() {
+    try {
+      const res = await fetch("/api/shopping");
+      if (!res.ok) throw new Error();
+      items = await res.json();
+    } catch {
+      items = lsGet("shopping_local") || [];
+    }
+    render();
+  }
+
+  async function saveItems() {
+    lsSet("shopping_local", items);
+    try {
+      await fetch("/api/shopping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items })
+      });
+    } catch {}
+  }
+
+  function addItem() {
+    const inp = document.getElementById("inp");
+    const qty = document.getElementById("qty");
+    const text = inp.value.trim();
+    if (!text) return;
+    items.push({ id: Date.now(), text, qty: qty.value.trim(), done: false });
+    inp.value = ""; qty.value = "";
+    saveItems(); render();
+    inp.focus();
+  }
+
+  function toggle(id) {
+    const item = items.find(i => i.id === id);
+    if (item) { item.done = !item.done; saveItems(); render(); }
+  }
+
+  function del(id) {
+    items = items.filter(i => i.id !== id);
+    saveItems(); render();
+  }
+
+  function clearDone() {
+    items = items.filter(i => !i.done);
+    saveItems(); render();
+  }
+
+  function escHtml(s) { return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function render() {
+    const open = items.filter(i => !i.done);
+    const done = items.filter(i => i.done);
+    document.getElementById("stats").textContent = open.length + " offen" + (done.length > 0 ? " · " + done.length + " erledigt" : "");
+
+    let html = "";
+    if (open.length === 0 && done.length === 0) {
+      html = `<div class="empty">Liste ist leer 🎉</div>`;
+    } else {
+      html += open.map(item => itemHtml(item)).join("");
+      if (done.length > 0) {
+        html += `<div class="done-section">
+          <button class="done-toggle" onclick="showDone=!showDone;render()">
+            ${showDone ? "▾" : "▸"} Erledigte anzeigen (${done.length})
+          </button>
+          ${showDone ? done.map(item => itemHtml(item)).join("") : ""}
+        </div>`;
+      }
+    }
+    document.getElementById("list").innerHTML = html;
+  }
+
+  function itemHtml(item) {
+    return `<div class="item${item.done ? " done" : ""}">
+      <button class="check${item.done ? " checked" : ""}" onclick="toggle(${item.id})">${item.done ? "✓" : ""}</button>
+      <span class="item-text${item.done ? " done-text" : ""}">${escHtml(item.text)}</span>
+      ${item.qty ? `<span class="item-qty">${escHtml(item.qty)}</span>` : ""}
+      <button class="item-del" onclick="del(${item.id})">×</button>
+    </div>`;
+  }
+
+  // Auto-refresh every 15 seconds
+  setInterval(loadItems, 15 * 1000);
+
+  loadItems();
+</script>
+</body>
+</html>
