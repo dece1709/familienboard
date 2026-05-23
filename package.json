@@ -1,1 +1,9 @@
+{
+  "name": "familienboard",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "bring-shopping": "^2.0.1"
+  }
+}
 
