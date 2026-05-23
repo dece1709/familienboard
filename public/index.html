@@ -345,16 +345,19 @@
 
   async function loadShopping() {
     try {
-      const res = await fetch("/api/shopping");
+      const res = await fetch("/api/bring");
       if (!res.ok) throw new Error();
       shoppingItems = await res.json();
     } catch { shoppingItems = lsGet("shopping_local") || []; }
     renderShop();
   }
-  async function saveShopping() {
-    lsSet("shopping_local", shoppingItems);
+  async function bringAction(action, item) {
     try {
-      await fetch("/api/shopping", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: shoppingItems }) });
+      await fetch("/api/bring", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, item })
+      });
     } catch {}
   }
   function addShopItem() {
@@ -362,16 +365,35 @@
     const qty = document.getElementById("shop-qty");
     const text = inp.value.trim();
     if (!text) return;
-    shoppingItems.push({ id: Date.now(), text, qty: qty.value.trim(), done: false });
+    const newItem = { id: Date.now(), text, qty: qty.value.trim(), done: false };
+    shoppingItems.push(newItem);
     inp.value = ""; qty.value = "";
-    saveShopping(); renderShop();
+    bringAction("add", newItem);
+    renderShop();
   }
   function toggleShopItem(id) {
     const item = shoppingItems.find(i => i.id === id);
-    if (item) { item.done = !item.done; saveShopping(); renderShop(); }
+    if (!item) return;
+    if (!item.done) {
+      bringAction("complete", item);
+    } else {
+      bringAction("add", item);
+    }
+    item.done = !item.done;
+    renderShop();
+    setTimeout(loadShopping, 1000);
   }
-  function deleteShopItem(id) { shoppingItems = shoppingItems.filter(i => i.id !== id); saveShopping(); renderShop(); }
-  function clearDoneItems() { shoppingItems = shoppingItems.filter(i => !i.done); saveShopping(); renderShop(); }
+  function deleteShopItem(id) {
+    const item = shoppingItems.find(i => i.id === id);
+    if (item) bringAction("remove", item);
+    shoppingItems = shoppingItems.filter(i => i.id !== id);
+    renderShop();
+  }
+  function clearDoneItems() {
+    shoppingItems.filter(i => i.done).forEach(item => bringAction("remove", item));
+    shoppingItems = shoppingItems.filter(i => !i.done);
+    renderShop();
+  }
   function renderShop() {
     const list = document.getElementById("shop-list");
     const stats = document.getElementById("shop-stats");
