@@ -107,7 +107,7 @@
 
   async function loadItems() {
     try {
-      const res = await fetch("/api/shopping");
+      const res = await fetch("/api/bring");
       if (!res.ok) throw new Error();
       items = await res.json();
     } catch {
@@ -116,13 +116,12 @@
     render();
   }
 
-  async function saveItems() {
-    lsSet("shopping_local", items);
+  async function bringAction(action, item) {
     try {
-      await fetch("/api/shopping", {
+      await fetch("/api/bring", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items })
+        body: JSON.stringify({ action, item })
       });
     } catch {}
   }
@@ -132,25 +131,35 @@
     const qty = document.getElementById("qty");
     const text = inp.value.trim();
     if (!text) return;
-    items.push({ id: Date.now(), text, qty: qty.value.trim(), done: false });
+    const newItem = { id: Date.now(), text, qty: qty.value.trim(), done: false };
+    items.push(newItem);
     inp.value = ""; qty.value = "";
-    saveItems(); render();
+    bringAction("add", newItem);
+    render();
     inp.focus();
+    setTimeout(loadItems, 1000);
   }
 
   function toggle(id) {
     const item = items.find(i => i.id === id);
-    if (item) { item.done = !item.done; saveItems(); render(); }
+    if (!item) return;
+    bringAction(item.done ? "add" : "complete", item);
+    item.done = !item.done;
+    render();
+    setTimeout(loadItems, 1000);
   }
 
   function del(id) {
+    const item = items.find(i => i.id === id);
+    if (item) bringAction("remove", item);
     items = items.filter(i => i.id !== id);
-    saveItems(); render();
+    render();
   }
 
   function clearDone() {
+    items.filter(i => i.done).forEach(item => bringAction("remove", item));
     items = items.filter(i => !i.done);
-    saveItems(); render();
+    render();
   }
 
   function escHtml(s) { return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
