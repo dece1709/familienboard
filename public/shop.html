@@ -140,19 +140,23 @@
     setTimeout(loadItems, 1000);
   }
 
-  function toggle(id) {
-    const item = items.find(i => i.id === id);
+  function toggle(idx) {
+    const sorted = [...items.filter(i => !i.done), ...items.filter(i => i.done)];
+    const item = sorted[idx];
     if (!item) return;
     bringAction(item.done ? "add" : "complete", item);
     item.done = !item.done;
     render();
-    setTimeout(loadItems, 1000);
+    setTimeout(loadItems, 2000);
   }
 
-  function del(id) {
-    const item = items.find(i => i.id === id);
-    if (item) bringAction("remove", item);
-    items = items.filter(i => i.id !== id);
+  function del(idx) {
+    const sorted = [...items.filter(i => !i.done), ...items.filter(i => i.done)];
+    const item = sorted[idx];
+    if (item) {
+      bringAction("remove", item);
+      items = items.filter(i => i !== item);
+    }
     render();
   }
 
@@ -173,25 +177,25 @@
     if (open.length === 0 && done.length === 0) {
       html = `<div class="empty">Liste ist leer 🎉</div>`;
     } else {
-      html += open.map(item => itemHtml(item)).join("");
+      html += open.map((item, idx) => itemHtml(item, idx)).join("");
       if (done.length > 0) {
         html += `<div class="done-section">
           <button class="done-toggle" onclick="showDone=!showDone;render()">
             ${showDone ? "▾" : "▸"} Erledigte anzeigen (${done.length})
           </button>
-          ${showDone ? done.map(item => itemHtml(item)).join("") : ""}
+          ${showDone ? done.map((item, idx) => itemHtml(item, open.length + idx)).join("") : ""}
         </div>`;
       }
     }
     document.getElementById("list").innerHTML = html;
   }
 
-  function itemHtml(item) {
+  function itemHtml(item, idx) {
     return `<div class="item${item.done ? " done" : ""}">
-      <button class="check${item.done ? " checked" : ""}" onclick="toggle(${item.id})">${item.done ? "✓" : ""}</button>
+      <button class="check${item.done ? " checked" : ""}" onclick="toggle(${idx})">${item.done ? "✓" : ""}</button>
       <span class="item-text${item.done ? " done-text" : ""}">${escHtml(item.text)}</span>
       ${item.qty ? `<span class="item-qty">${escHtml(item.qty)}</span>` : ""}
-      <button class="item-del" onclick="del(${item.id})">×</button>
+      <button class="item-del" onclick="del(${idx})">×</button>
     </div>`;
   }
 
