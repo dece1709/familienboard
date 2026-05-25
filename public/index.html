@@ -138,7 +138,7 @@
     .modal { background: #fff; border-radius: 20px; padding: 24px; width: min(560px, 92vw); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
     .modal h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; }
     .modal label { font-size: 12px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
-    .modal input { width: 100%; border: 1.5px solid #E8E4DC; border-radius: 11px; padding: 11px 13px; font-size: 14px; background: #FAFAF8; color: #1A1A2E; outline: none; }
+    .modal input { width: 100%; border: 1.5px solid #E8E4DC; border-radius: 11px; padding: 11px 13px; font-size: 14px; background: #FAFAF8; color: #1A1A2E; outline: none; user-select: text !important; -webkit-user-select: text !important; touch-action: auto !important; }
     .modal input:focus { outline: 2px solid #2D6A4F44; }
     .modal-hint { font-size: 11px; color: #8A8A9A; margin-top: 3px; line-height: 1.6; }
     .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -203,7 +203,7 @@
 </div>
 
 <!-- Settings Modal -->
-<div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettingsOverlay(event)">
+<div class="modal-overlay" id="settings-modal" style="display:none" onclick="closeSettingsOverlay(event)" ontouchstart="event.stopPropagation()">
   <div class="modal" onclick="event.stopPropagation()">
     <h2>Einstellungen</h2>
     <div>
@@ -255,7 +255,7 @@
     const old = lsGet("cal_ics");
     const saved = lsGet("calendars_v2");
     if (saved && saved.length > 0) {
-      calendars = saved.map(c => ({ ...c, events: [], status: "", lastSync: null }));
+      calendars = saved.map(c => ({ ...c, events: c.events || [], status: "", lastSync: null }));
     } else if (old) {
       calendars = [{ id: "cal_0", name: "Familienkalender", url: old, color: CAL_COLORS[0], events: [], status: "", lastSync: null }];
       saveCals();
