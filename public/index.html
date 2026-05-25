@@ -519,6 +519,7 @@
     if (tab === "week") { calStartOffset = -4; calEndOffset = 52; }
     renderCal();
     if (tab === "week") setTimeout(scrollToCurrentWeek, 80);
+    if (tab === "upcoming") setTimeout(() => { const p = document.getElementById("cal-scroll"); if (p) p.scrollTop = 0; }, 50);
   }
 
   function scrollToCurrentWeek() {
