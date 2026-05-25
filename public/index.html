@@ -240,7 +240,7 @@
   const DAYS_SHORT_WX = ["So","Mo","Di","Mi","Do","Fr","Sa"];
   const MONTHS = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
   const MONTHS_SHORT = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-  const CAL_COLORS = ["#1A73E8","#2D6A4F","#C77DFF","#E07A5F","#F4A261","#2A9D8F","#E76F51"];
+  const CAL_COLORS = ["#1558D6","#1A7A3C","#9B27D4","#D62828","#E67E00","#0097A7","#C2185B"];
   const MAX_EV = 3;
 
   let currentTab = "week";
@@ -629,16 +629,37 @@
     document.getElementById("settings-modal").style.display = "flex";
   }
   function closeSettingsOverlay(e) { if (e.target === document.getElementById("settings-modal")) document.getElementById("settings-modal").style.display = "none"; }
+  const COLOR_OPTIONS = [
+    "#1558D6","#1A7A3C","#9B27D4","#D62828","#E67E00",
+    "#0097A7","#C2185B","#FF6B00","#558B2F","#4527A0"
+  ];
+
+  function setCalColor(i, color) {
+    calendars[i].color = color;
+    saveCals();
+    renderCalList();
+    renderCal();
+    updateSyncRow();
+  }
+
   function renderCalList() {
     const list = document.getElementById("cal-list");
     if (calendars.length === 0) { list.innerHTML = '<p style="font-size:12px;color:#8A8A9A">Noch keine Kalender.</p>'; return; }
-    list.innerHTML = calendars.map((cal, i) =>
-      '<div class="cal-item">' +
-      '<div class="cal-dot" style="background:' + cal.color + '"></div>' +
-      '<div style="flex:1"><div class="cal-name">' + escHtml(cal.name) + '</div>' +
-      '<div class="cal-status">' + (cal.status === "ok" ? "✓ " + cal.events.length + " Termine" : cal.status === "error" ? "⚠️ Fehler" : cal.status === "loading" ? "⏳ Lädt…" : "Nicht geladen") + '</div></div>' +
-      '<button class="btn-danger" onclick="removeCal(' + i + ')">Entfernen</button></div>'
-    ).join("");
+    list.innerHTML = calendars.map((cal, i) => {
+      const colorDots = COLOR_OPTIONS.map(c => {
+        const border = cal.color === c ? "3px solid #1A1A2E" : "2px solid transparent";
+        return '<button onclick="setCalColor(' + i + ', &quot;' + c + '&quot;)" style="width:26px;height:26px;border-radius:50%;background:' + c + ';border:' + border + ';cursor:pointer;flex-shrink:0"></button>';
+      }).join("");
+      const status = cal.status === "ok" ? "✓ " + cal.events.length + " Termine" : cal.status === "error" ? "⚠️ Fehler" : cal.status === "loading" ? "⏳ Lädt…" : "Nicht geladen";
+      return '<div class="cal-item" style="flex-direction:column;align-items:flex-start;gap:8px">' +
+        '<div style="display:flex;align-items:center;gap:10px;width:100%">' +
+        '<div class="cal-dot" style="background:' + cal.color + '"></div>' +
+        '<div style="flex:1"><div class="cal-name">' + escHtml(cal.name) + '</div><div class="cal-status">' + status + '</div></div>' +
+        '<button class="btn-danger" onclick="removeCal(' + i + ')">Entfernen</button>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-left:18px">' + colorDots + '</div>' +
+        '</div>';
+    }).join("");
   }
   async function addCalendar() {
     const name = document.getElementById("new-cal-name").value.trim();
