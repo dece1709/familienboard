@@ -11,7 +11,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: 100%; }
-    body { background: #F7F4EF; font-family: 'DM Sans', sans-serif; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; user-select: none; min-height: 100dvh; }
+    body { background: #F7F4EF; font-family: 'DM Sans', sans-serif; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; min-height: 100dvh; }
     button { touch-action: manipulation; font-family: 'DM Sans', sans-serif; cursor: pointer; }
     input { font-family: 'DM Sans', sans-serif; user-select: text; -webkit-user-select: text; }
     @keyframes blink { 50% { opacity: 0.2; } }
@@ -40,7 +40,7 @@
     #main { flex: 1; display: flex; overflow: hidden; min-height: 0; }
 
     /* Calendar panel */
-    #cal-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+    #cal-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; user-select: none; -webkit-user-select: none; }
     #cal-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 12px 0px 18px; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 
     /* Tab bar - inside cal panel */
@@ -116,7 +116,7 @@
     .shop-qty { font-size: 11px; color: #8A8A9A; font-weight: 600; background: #F7F4EF; border-radius: 5px; padding: 1px 6px; flex-shrink: 0; }
     .shop-del { background: none; border: none; color: #D0D0D0; font-size: 17px; padding: 0 2px; flex-shrink: 0; }
     .shop-add { padding: 7px 9px; border-top: 1px solid #E8E4DC; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; margin-top: auto; }
-    .shop-add input { border: 1.5px solid #E8E4DC; border-radius: 9px; padding: 8px 10px; font-size: 11px; background: #fff; color: #1A1A2E; outline: none; width: 100%; }
+    .shop-add input { border: 1.5px solid #E8E4DC; border-radius: 9px; padding: 8px 10px; font-size: 11px; background: #fff; color: #1A1A2E; outline: none; width: 100%; user-select: text; -webkit-user-select: text; }
     .shop-add input:focus { outline: 2px solid #E07A5F33; }
     .shop-add-row { display: flex; gap: 5px; }
     .shop-qty-input { width: 58px !important; flex: none !important; }
@@ -138,7 +138,7 @@
     .modal { background: #fff; border-radius: 20px; padding: 24px; width: min(560px, 92vw); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
     .modal h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: #1A1A2E; }
     .modal label { font-size: 12px; font-weight: 700; color: #8A8A9A; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; }
-    .modal input { width: 100%; border: 1.5px solid #E8E4DC; border-radius: 11px; padding: 11px 13px; font-size: 14px; background: #FAFAF8; color: #1A1A2E; outline: none; user-select: text !important; -webkit-user-select: text !important; touch-action: auto !important; }
+    .modal input { width: 100%; border: 1.5px solid #E8E4DC; border-radius: 11px; padding: 11px 13px; font-size: 14px; background: #FAFAF8; color: #1A1A2E; outline: none; user-select: text; -webkit-user-select: text; }
     .modal input:focus { outline: 2px solid #2D6A4F44; }
     .modal-hint { font-size: 11px; color: #8A8A9A; margin-top: 3px; line-height: 1.6; }
     .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; }
